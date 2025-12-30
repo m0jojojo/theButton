@@ -3,25 +3,50 @@
 
 import bcrypt from 'bcryptjs';
 
+export type UserRole = 'customer' | 'admin';
+
 export interface User {
   id: string;
   email: string;
   phone?: string;
   name: string;
   passwordHash: string;
+  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
 }
 
 // In-memory user store (replace with database)
-const users: Map<string, User> = new Map();
-const usersByEmail: Map<string, User> = new Map();
+// Use global to persist across hot reloads
+declare global {
+  var __users_store: Map<string, User> | undefined;
+  var __users_by_email: Map<string, User> | undefined;
+}
+
+// Initialize or reuse existing stores (persists across hot reloads)
+const users: Map<string, User> = global.__users_store || new Map();
+const usersByEmail: Map<string, User> = global.__users_by_email || new Map();
+
+// Store references globally to persist across hot reloads
+if (!global.__users_store) {
+  global.__users_store = users;
+  global.__users_by_email = usersByEmail;
+  console.log('[users.ts] Initialized new user stores');
+} else {
+  console.log(`[users.ts] Reusing existing stores - Total users: ${users.size}`);
+}
+
+// Export function to get all users (for admin)
+export function getAllUsers(): User[] {
+  return Array.from(users.values());
+}
 
 export async function createUser(data: {
   email: string;
   phone?: string;
   name: string;
   password: string;
+  role?: UserRole;
 }): Promise<User> {
   // Check if user already exists
   if (usersByEmail.has(data.email.toLowerCase())) {
@@ -38,6 +63,7 @@ export async function createUser(data: {
     phone: data.phone,
     name: data.name,
     passwordHash,
+    role: data.role || 'customer',
     createdAt: new Date(),
     updatedAt: new Date(),
   };

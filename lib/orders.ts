@@ -63,6 +63,11 @@ if (!global.__orders_store) {
   console.log(`[orders.ts] Reusing existing stores - Total orders: ${orders.size}, Total emails: ${ordersByUserEmail.size}`);
 }
 
+// Export function to get all orders (for admin)
+export function getAllOrders(): Order[] {
+  return Array.from(orders.values());
+}
+
 export async function createOrder(data: {
   orderId: string;
   userId: string;
