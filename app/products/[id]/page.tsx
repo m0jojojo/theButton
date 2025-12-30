@@ -4,6 +4,7 @@ import ProductInfo from '@/components/ProductInfo';
 import StickyAddToCart from '@/components/StickyAddToCart';
 import StickyWhatsApp from '@/components/StickyWhatsApp';
 import ProductViewTracker from '@/components/ProductViewTracker';
+import ProductReviews from '@/components/ProductReviews';
 import { products, getProductById } from '@/lib/products';
 
 export async function generateStaticParams() {
@@ -38,6 +39,11 @@ export default function ProductPage({
             <ProductInfo product={product} />
           </div>
         </div>
+      </div>
+
+      {/* Product Reviews */}
+      <div className="container mx-auto px-4 py-6 md:py-8">
+        <ProductReviews productId={product.id} />
       </div>
 
       {/* Sticky Add to Cart (Mobile & Desktop) */}
