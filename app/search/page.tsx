@@ -202,15 +202,28 @@ function SearchResultsContent() {
                   aria-label={`View ${product.name} - ${formatPrice(product.price)}`}
                 >
                   <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-3">
-                    {product.images[0] && product.images[0].startsWith('http') ? (
-                      <Image
-                        src={product.images[0]}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        quality={80}
-                      />
+                    {product.images[0] ? (
+                      product.images[0].startsWith('data:') ? (
+                        // Base64 data URL - use regular img tag
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : product.images[0].startsWith('http') ? (
+                        // HTTP/HTTPS URL - use Next.js Image
+                        <Image
+                          src={product.images[0]}
+                          alt={product.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                          quality={80}
+                        />
+                      ) : (
+                        // Placeholder for invalid images
+                        <PlaceholderImage alt={product.name} />
+                      )
                     ) : (
                       <PlaceholderImage alt={product.name} />
                     )}
