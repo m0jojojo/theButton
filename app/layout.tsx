@@ -8,6 +8,13 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Analytics from "@/components/Analytics";
 import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 
+// Initialize default admin user (only in development)
+if (process.env.NODE_ENV === 'development') {
+  import('@/lib/init-admin').catch(() => {
+    // Ignore errors during initialization
+  });
+}
+
 const inter = Inter({ 
   subsets: ["latin"],
   display: 'swap',
