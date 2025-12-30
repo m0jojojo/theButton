@@ -218,9 +218,15 @@ export default function AdminProductsPage() {
                               >
                                 View
                               </Link>
+                              <Link
+                                href={`/admin/products/${product.id}/edit`}
+                                className="text-gray-900 hover:text-gray-600 transition-colors mr-4"
+                              >
+                                Edit
+                              </Link>
                               <button
                                 onClick={() => handleDelete(product.id)}
-                                className="text-red-600 hover:text-red-800 transition-colors ml-4"
+                                className="text-red-600 hover:text-red-800 transition-colors"
                               >
                                 Delete
                               </button>
