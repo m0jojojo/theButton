@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromRequest, verifyToken } from '@/lib/jwt';
-import { getOrdersByUserId, getOrderPublic } from '@/lib/orders';
+import { getOrdersByUserId, getOrdersByUserEmail, getOrderPublic } from '@/lib/orders';
 
 export async function GET(request: NextRequest) {
   try {
