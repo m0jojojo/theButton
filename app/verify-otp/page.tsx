@@ -4,10 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 function VerifyOTPContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { token } = useAuth();
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
   const maskedPhone = phone ? `${phone.slice(0, 2)}****${phone.slice(-2)}` : '';
@@ -113,24 +116,58 @@ function VerifyOTPContent() {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Verify OTP
+    let isVerified = false;
     if (typeof window !== 'undefined') {
       const stored = sessionStorage.getItem('otp_verification');
       if (stored) {
         const data = JSON.parse(stored);
         if (data.otp === otpToVerify && data.orderId === orderId) {
-          // OTP verified - redirect to success page
-          sessionStorage.removeItem('otp_verification');
-          router.replace(`/order-success?orderId=${orderId}`);
-          return;
+          isVerified = true;
         }
       }
     }
 
     // Fallback: verify against stored OTP
-    if (otpToVerify === storedOtp) {
+    if (!isVerified && otpToVerify === storedOtp) {
+      isVerified = true;
+    }
+
+    if (isVerified) {
+      // Save order to database if user is authenticated and order not already saved
+      if (token && typeof window !== 'undefined') {
+        const pendingOrder = sessionStorage.getItem('pending_order');
+        if (pendingOrder) {
+          try {
+            const orderData = JSON.parse(pendingOrder);
+            const orderResponse = await fetch('/api/orders/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify(orderData),
+            });
+
+            if (orderResponse.ok) {
+              console.log('Order saved after OTP verification:', orderId);
+              sessionStorage.removeItem('pending_order');
+            } else {
+              console.error('Failed to save order after OTP verification');
+              // Keep in sessionStorage for retry
+            }
+          } catch (error) {
+            console.error('Error saving order after OTP verification:', error);
+            // Keep in sessionStorage for retry
+          }
+        }
+      }
+
+      // Clear OTP verification data
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('otp_verification');
       }
+      
+      // Redirect to success page
       router.replace(`/order-success?orderId=${orderId}`);
       return;
     }

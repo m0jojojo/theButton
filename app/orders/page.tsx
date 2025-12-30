@@ -39,9 +39,12 @@ function OrdersContent() {
 
         if (response.ok) {
           const data = await response.json();
-          setOrders(data.orders);
+          console.log('Orders fetched:', data.orders);
+          setOrders(data.orders || []);
         } else {
-          setError('Failed to load orders');
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Failed to load orders:', response.status, errorData);
+          setError(errorData.error || 'Failed to load orders');
         }
       } catch (err) {
         console.error('Error fetching orders:', err);

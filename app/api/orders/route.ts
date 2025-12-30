@@ -23,11 +23,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's orders
-    const orders = await getOrdersByUserId(payload.userId);
+    const userOrders = await getOrdersByUserId(payload.userId);
+    
+    console.log(`Fetching orders for user: ${payload.userId}, found ${userOrders.length} orders`);
 
     // Return orders
     return NextResponse.json({
-      orders: orders.map(getOrderPublic),
+      orders: userOrders.map(getOrderPublic),
     });
   } catch (error) {
     console.error('Get orders error:', error);

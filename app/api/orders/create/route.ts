@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
       shippingAddress,
     });
 
+    console.log(`Order created: ${order.orderId} for user: ${payload.userId}`);
+
     // Return order
     return NextResponse.json(
       {

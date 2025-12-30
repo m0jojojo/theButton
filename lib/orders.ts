@@ -78,6 +78,8 @@ export async function createOrder(data: {
   userOrders.push(order);
   ordersByUserId.set(data.userId, userOrders);
 
+  console.log(`Order stored: ${order.orderId}, User: ${data.userId}, Total orders for user: ${userOrders.length}`);
+
   return order;
 }
 
@@ -96,6 +98,8 @@ export async function getOrderByOrderId(orderId: string): Promise<Order | null> 
 
 export async function getOrdersByUserId(userId: string): Promise<Order[]> {
   const userOrders = ordersByUserId.get(userId) || [];
+  console.log(`Getting orders for user ${userId}: found ${userOrders.length} orders`);
+  console.log(`Total orders in store: ${orders.size}, Total users with orders: ${ordersByUserId.size}`);
   // Sort by date (newest first)
   return userOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }

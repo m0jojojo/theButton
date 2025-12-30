@@ -140,50 +140,70 @@ export default function CheckoutForm({
       // Generate order ID
       const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
+      // Store order data temporarily (will be saved after OTP verification)
+      const orderData = {
+        orderId,
+        paymentMethod: formData.paymentMethod,
+        paymentStatus: formData.paymentMethod === 'cod' ? 'pending' : 'paid',
+        items: items.map((item) => ({
+          id: item.id,
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          compareAtPrice: item.compareAtPrice,
+          size: item.size,
+          quantity: item.quantity,
+          image: item.image,
+        })),
+        subtotal,
+        shipping,
+        total,
+        shippingAddress: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+        },
+      };
+
+      // Save order data to sessionStorage for later use
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_order', JSON.stringify(orderData));
+      }
+
       // Save order to database if user is authenticated
       if (token) {
         try {
-          const orderItems = items.map((item) => ({
-            id: item.id,
-            productId: item.productId,
-            name: item.name,
-            price: item.price,
-            compareAtPrice: item.compareAtPrice,
-            size: item.size,
-            quantity: item.quantity,
-            image: item.image,
-          }));
-
-          await fetch('/api/orders/create', {
+          const orderResponse = await fetch('/api/orders/create', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify({
-              orderId,
-              paymentMethod: formData.paymentMethod,
-              paymentStatus: formData.paymentMethod === 'cod' ? 'pending' : 'paid',
-              items: orderItems,
-              subtotal,
-              shipping,
-              total,
-              shippingAddress: {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                phone: formData.phone,
-                address: formData.address,
-                city: formData.city,
-                state: formData.state,
-                pincode: formData.pincode,
-              },
-            }),
+            body: JSON.stringify(orderData),
           });
+
+          if (!orderResponse.ok) {
+            const errorData = await orderResponse.json().catch(() => ({}));
+            console.error('Error saving order:', errorData.error || 'Unknown error', orderResponse.status);
+            // Order data is in sessionStorage, will be saved after OTP verification
+          } else {
+            console.log('Order saved successfully:', orderId);
+            // Remove from sessionStorage if saved successfully
+            if (typeof window !== 'undefined') {
+              sessionStorage.removeItem('pending_order');
+            }
+          }
         } catch (error) {
           console.error('Error saving order:', error);
-          // Don't block order flow if saving fails
+          // Order data is in sessionStorage, will be saved after OTP verification
         }
+      } else {
+        console.log('User not authenticated, order data stored in sessionStorage');
       }
 
       if (formData.paymentMethod === 'razorpay') {
