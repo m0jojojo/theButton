@@ -27,7 +27,7 @@ const collectionInfo: Record<string, { name: string; description: string }> = {
 };
 
 export async function generateStaticParams() {
-  return Object.keys(collections).map((slug) => ({
+  return Object.keys(collectionInfo).map((slug) => ({
     slug,
   }));
 }
