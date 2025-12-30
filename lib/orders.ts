@@ -41,9 +41,27 @@ export interface Order {
 }
 
 // In-memory order store (replace with database)
-const orders: Map<string, Order> = new Map();
-const ordersByUserId: Map<string, Order[]> = new Map();
-const ordersByUserEmail: Map<string, Order[]> = new Map(); // Use email for matching
+// Use global to persist across hot reloads in Next.js
+declare global {
+  var __orders_store: Map<string, Order> | undefined;
+  var __orders_by_user_id: Map<string, Order[]> | undefined;
+  var __orders_by_user_email: Map<string, Order[]> | undefined;
+}
+
+// Initialize or reuse existing stores (persists across hot reloads)
+const orders: Map<string, Order> = global.__orders_store || new Map();
+const ordersByUserId: Map<string, Order[]> = global.__orders_by_user_id || new Map();
+const ordersByUserEmail: Map<string, Order[]> = global.__orders_by_user_email || new Map();
+
+// Store references globally to persist across hot reloads
+if (!global.__orders_store) {
+  global.__orders_store = orders;
+  global.__orders_by_user_id = ordersByUserId;
+  global.__orders_by_user_email = ordersByUserEmail;
+  console.log('[orders.ts] Initialized new order stores');
+} else {
+  console.log(`[orders.ts] Reusing existing stores - Total orders: ${orders.size}, Total emails: ${ordersByUserEmail.size}`);
+}
 
 export async function createOrder(data: {
   orderId: string;
@@ -92,6 +110,7 @@ export async function createOrder(data: {
   console.log(`[createOrder] Total orders for this email: ${userOrdersByEmail.length}`);
   console.log(`[createOrder] Total orders in store: ${orders.size}`);
   console.log(`[createOrder] Total unique emails with orders: ${ordersByUserEmail.size}`);
+  console.log(`[createOrder] All email keys:`, Array.from(ordersByUserEmail.keys()));
 
   return order;
 }
@@ -123,10 +142,8 @@ export async function getOrdersByUserEmail(userEmail: string): Promise<Order[]> 
   console.log(`[getOrdersByUserEmail] Total orders in store: ${orders.size}`);
   console.log(`[getOrdersByUserEmail] Total unique emails with orders: ${ordersByUserEmail.size}`);
   console.log(`[getOrdersByUserEmail] Available email keys:`, Array.from(ordersByUserEmail.keys()));
-  
   const userOrders = ordersByUserEmail.get(normalizedEmail) || [];
   console.log(`[getOrdersByUserEmail] Found ${userOrders.length} orders for email: ${normalizedEmail}`);
-  
   // Sort by date (newest first)
   return userOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
@@ -190,11 +207,10 @@ export async function updateOrderPaymentStatus(
 
 // Helper to get order without sensitive data
 export function getOrderPublic(order: Order) {
-  const { id, ...publicOrder } = order; // Remove internal ID
   return {
-    ...publicOrder,
-    createdAt: publicOrder.createdAt.toISOString(),
-    updatedAt: publicOrder.updatedAt.toISOString(),
+    ...order,
+    createdAt: order.createdAt.toISOString(),
+    updatedAt: order.updatedAt.toISOString(),
   };
 }
 

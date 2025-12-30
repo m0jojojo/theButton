@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
     // Normalize email to lowercase for consistent matching
     const normalizedEmail = payload.email.toLowerCase();
     console.log(`[GET /api/orders] Fetching orders for email: ${normalizedEmail} (original: ${payload.email}), userId: ${payload.userId}`);
-    
     let userOrders = await getOrdersByUserEmail(normalizedEmail);
     
     // If no orders found by email, try by userId (for backward compatibility)
@@ -35,7 +34,7 @@ export async function GET(request: NextRequest) {
       userOrders = await getOrdersByUserId(payload.userId);
     }
     
-    console.log(`[GET /api/orders] Found ${userOrders.length} orders for user: ${normalizedEmail} (ID: ${payload.userId})`);
+    console.log(`[GET /api/orders] Found ${userOrders.length} orders for user: ${payload.email} (ID: ${payload.userId})`);
 
     // Return orders
     return NextResponse.json({
