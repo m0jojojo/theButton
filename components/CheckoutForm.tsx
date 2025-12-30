@@ -178,6 +178,14 @@ export default function CheckoutForm({
       // Save order to database if user is authenticated
       if (token) {
         try {
+          // Decode token to log email (for debugging)
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            console.log('Saving order for authenticated user:', payload.email, 'userId:', payload.userId);
+          } catch (e) {
+            console.log('Could not decode token for debugging');
+          }
+
           const orderResponse = await fetch('/api/orders/create', {
             method: 'POST',
             headers: {
@@ -192,7 +200,9 @@ export default function CheckoutForm({
             console.error('Error saving order:', errorData.error || 'Unknown error', orderResponse.status);
             // Order data is in sessionStorage, will be saved after OTP verification
           } else {
+            const savedOrder = await orderResponse.json().catch(() => ({}));
             console.log('Order saved successfully:', orderId);
+            console.log('Saved order details:', savedOrder.order?.orderId, 'for email:', savedOrder.order?.userEmail);
             // Remove from sessionStorage if saved successfully
             if (typeof window !== 'undefined') {
               sessionStorage.removeItem('pending_order');

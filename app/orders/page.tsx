@@ -31,6 +31,14 @@ function OrdersContent() {
 
     const fetchOrders = async () => {
       try {
+        // Decode token to see email (for debugging)
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          console.log('Fetching orders for email:', payload.email, 'userId:', payload.userId);
+        } catch (e) {
+          console.log('Could not decode token for debugging');
+        }
+
         const response = await fetch('/api/orders', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -40,6 +48,7 @@ function OrdersContent() {
         if (response.ok) {
           const data = await response.json();
           console.log('Orders fetched:', data.orders);
+          console.log('Number of orders:', data.orders?.length || 0);
           setOrders(data.orders || []);
         } else {
           const errorData = await response.json().catch(() => ({}));
