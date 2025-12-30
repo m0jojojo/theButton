@@ -44,7 +44,23 @@ export default function EditProductPage() {
 
         const data = await response.json();
         setProduct(data.product);
-        setImageUrls(data.product.images || []);
+        
+        // Separate base64 images from URL images
+        const existingImages = data.product.images || [];
+        const base64Images: string[] = [];
+        const urlImages: string[] = [];
+        
+        existingImages.forEach((img: string) => {
+          if (img.startsWith('data:')) {
+            base64Images.push(img);
+          } else {
+            urlImages.push(img);
+          }
+        });
+        
+        setUploadedImages(base64Images);
+        setImageUrls(urlImages);
+        
         setFormData({
           name: data.product.name,
           price: data.product.price.toString(),
