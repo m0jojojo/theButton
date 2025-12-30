@@ -67,6 +67,9 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             <CheckoutForm
               total={total}
+              subtotal={subtotal}
+              shipping={shipping}
+              items={items}
               onOrderSuccess={handleOrderSuccess}
               isProcessing={isProcessing}
               setIsProcessing={setIsProcessing}

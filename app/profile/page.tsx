@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/AuthGuard';
 
@@ -156,9 +157,15 @@ function ProfileContent() {
                 </>
               ) : (
                 <>
+                  <Link
+                    href="/orders"
+                    className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors text-center"
+                  >
+                    My Orders
+                  </Link>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Edit Profile
                   </button>

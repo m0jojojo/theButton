@@ -2,9 +2,14 @@
 
 import { useState } from 'react';
 import { initiateRazorpayPayment, createRazorpayOrder } from '@/lib/razorpay';
+import { useAuth } from '@/contexts/AuthContext';
+import { CartItem } from '@/contexts/CartContext';
 
 interface CheckoutFormProps {
   total: number;
+  subtotal: number;
+  shipping: number;
+  items: CartItem[];
   onOrderSuccess: (orderId: string, phone: string) => void;
   isProcessing: boolean;
   setIsProcessing: (processing: boolean) => void;
@@ -12,10 +17,14 @@ interface CheckoutFormProps {
 
 export default function CheckoutForm({
   total,
+  subtotal,
+  shipping,
+  items,
   onOrderSuccess,
   isProcessing,
   setIsProcessing,
 }: CheckoutFormProps) {
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -130,6 +139,52 @@ export default function CheckoutForm({
     try {
       // Generate order ID
       const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      // Save order to database if user is authenticated
+      if (token) {
+        try {
+          const orderItems = items.map((item) => ({
+            id: item.id,
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            compareAtPrice: item.compareAtPrice,
+            size: item.size,
+            quantity: item.quantity,
+            image: item.image,
+          }));
+
+          await fetch('/api/orders/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              orderId,
+              paymentMethod: formData.paymentMethod,
+              paymentStatus: formData.paymentMethod === 'cod' ? 'pending' : 'paid',
+              items: orderItems,
+              subtotal,
+              shipping,
+              total,
+              shippingAddress: {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                address: formData.address,
+                city: formData.city,
+                state: formData.state,
+                pincode: formData.pincode,
+              },
+            }),
+          });
+        } catch (error) {
+          console.error('Error saving order:', error);
+          // Don't block order flow if saving fails
+        }
+      }
 
       if (formData.paymentMethod === 'razorpay') {
         try {
