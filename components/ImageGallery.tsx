@@ -13,6 +13,11 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
   const [selectedImage, setSelectedImage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
 
+  // Filter out invalid placeholder paths
+  const validImages = images?.filter((img: string) => 
+    img && (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://'))
+  ) || [];
+
   const handleImageClick = () => {
     setIsZoomed(!isZoomed);
   };
@@ -21,19 +26,19 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 group cursor-zoom-in">
-        {images[selectedImage] ? (
-          images[selectedImage].startsWith('data:') ? (
+        {validImages[selectedImage] ? (
+          validImages[selectedImage].startsWith('data:') ? (
             // Base64 data URL - use regular img tag
             <img
-              src={images[selectedImage]}
+              src={validImages[selectedImage]}
               alt={`${productName} - Image ${selectedImage + 1}`}
               className="w-full h-full object-cover cursor-pointer"
               onClick={handleImageClick}
             />
-          ) : images[selectedImage].startsWith('http') ? (
+          ) : validImages[selectedImage].startsWith('http') ? (
             // HTTP/HTTPS URL - use Next.js Image
             <Image
-              src={images[selectedImage]}
+              src={validImages[selectedImage]}
               alt={`${productName} - Image ${selectedImage + 1}`}
               fill
               className="object-cover"
@@ -67,9 +72,9 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
       </div>
 
       {/* Thumbnail Gallery */}
-      {images.length > 1 && (
+      {validImages.length > 1 && (
         <div className="grid grid-cols-4 md:grid-cols-5 gap-2 md:gap-3">
-          {images.map((image, index) => (
+          {validImages.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
@@ -132,18 +137,18 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               className="relative max-w-4xl w-full aspect-square"
               onClick={(e) => e.stopPropagation()}
             >
-              {images[selectedImage] ? (
-                images[selectedImage].startsWith('data:') ? (
+              {validImages[selectedImage] ? (
+                validImages[selectedImage].startsWith('data:') ? (
                   // Base64 data URL - use regular img tag
                   <img
-                    src={images[selectedImage]}
+                    src={validImages[selectedImage]}
                     alt={`${productName} - Zoomed view`}
                     className="w-full h-full object-contain rounded-lg"
                   />
-                ) : images[selectedImage].startsWith('http') ? (
+                ) : validImages[selectedImage].startsWith('http') ? (
                   // HTTP/HTTPS URL - use Next.js Image
                   <Image
-                    src={images[selectedImage]}
+                    src={validImages[selectedImage]}
                     alt={`${productName} - Zoomed view`}
                     fill
                     className="object-contain rounded-lg"
