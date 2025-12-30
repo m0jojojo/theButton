@@ -25,6 +25,8 @@ export default function EditProductPage() {
     images: '',
     sizes: '',
   });
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -42,6 +44,7 @@ export default function EditProductPage() {
 
         const data = await response.json();
         setProduct(data.product);
+        setImageUrls(data.product.images || []);
         setFormData({
           name: data.product.name,
           price: data.product.price.toString(),
@@ -49,7 +52,7 @@ export default function EditProductPage() {
           description: data.product.description,
           sku: data.product.sku,
           collection: data.product.collection,
-          images: data.product.images.join('\n'),
+          images: '', // Will be handled by imageUrls and uploadedImages
           sizes: JSON.stringify(data.product.sizes, null, 2),
         });
       } catch (err) {
@@ -62,6 +65,38 @@ export default function EditProductPage() {
 
     fetchProduct();
   }, [productId]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          setUploadedImages((prev) => [...prev, base64String]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const handleRemoveImage = (index: number, isUploaded: boolean) => {
+    if (isUploaded) {
+      setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setImageUrls((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleAddImageUrl = () => {
+    const url = formData.images.trim();
+    if (url && !imageUrls.includes(url) && !uploadedImages.includes(url)) {
+      setImageUrls((prev) => [...prev, url]);
+      setFormData({ ...formData, images: '' });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,8 +112,12 @@ export default function EditProductPage() {
         throw new Error('Invalid sizes JSON format');
       }
 
-      // Parse images (split by newline)
-      const images = formData.images.split('\n').filter(img => img.trim());
+      // Combine uploaded images (base64) and URL images
+      const allImages = [...uploadedImages, ...imageUrls];
+
+      if (allImages.length === 0) {
+        throw new Error('At least one image is required');
+      }
 
       const token = localStorage.getItem('theButton_token');
       const response = await fetch(`/api/admin/products/${productId}`, {
@@ -94,7 +133,7 @@ export default function EditProductPage() {
           description: formData.description,
           sku: formData.sku,
           collection: formData.collection,
-          images,
+          images: allImages,
           sizes: parsedSizes,
         }),
       });
@@ -295,18 +334,126 @@ export default function EditProductPage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
-                      Images (one URL per line) *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Product Images *
                     </label>
-                    <textarea
-                      id="images"
-                      value={formData.images}
-                      onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-                      required
-                      rows={3}
-                      placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 font-mono text-sm"
-                    />
+                    
+                    {/* Image Upload */}
+                    <div className="mb-4">
+                      <label
+                        htmlFor="image-upload"
+                        className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                      >
+                        <svg
+                          className="w-5 h-5 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Upload Images from Desktop
+                      </label>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <p className="mt-2 text-sm text-gray-500">
+                        Select one or more images from your computer
+                      </p>
+                    </div>
+
+                    {/* Add Image URL */}
+                    <div className="mb-4">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={formData.images}
+                          onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+                          placeholder="Or enter image URL"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddImageUrl();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddImageUrl}
+                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                          Add URL
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Image Preview */}
+                    {(uploadedImages.length > 0 || imageUrls.length > 0) && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                        {/* Uploaded Images */}
+                        {uploadedImages.map((image, index) => (
+                          <div key={`uploaded-${index}`} className="relative group">
+                            <img
+                              src={image}
+                              alt={`Uploaded ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index, true)}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                            <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                              New
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* URL Images */}
+                        {imageUrls.map((image, index) => (
+                          <div key={`url-${index}`} className="relative group">
+                            <img
+                              src={image}
+                              alt={`Image ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="12"%3EFailed to load%3C/text%3E%3C/svg%3E';
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index, false)}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {uploadedImages.length === 0 && imageUrls.length === 0 && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        No images added. Upload images or add URLs above.
+                      </p>
+                    )}
                   </div>
 
                   <div className="md:col-span-2">
