@@ -13,7 +13,13 @@ export interface Product {
   searchKeywords?: string[]; // For search functionality
 }
 
-export const products: Record<string, Product> = {
+// Use global to persist across hot reloads and sync with admin updates
+declare global {
+  var __products_store: Record<string, Product> | undefined;
+}
+
+// Initialize products - use global if exists, otherwise use default
+const defaultProducts: Record<string, Product> = {
   '1': {
     id: '1',
     name: 'Classic White Shirt',

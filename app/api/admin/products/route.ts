@@ -3,23 +3,16 @@ import { getTokenFromRequest } from '@/lib/jwt';
 import { requireAdmin } from '@/lib/admin';
 import { getAllProducts, getProductById, Product } from '@/lib/products';
 
-// In-memory product store (for admin operations)
-// In production, this would be a database
+// Import products from lib/products which uses global store
+import { products as productsStore } from '@/lib/products';
+
+// Get reference to the global store
 declare global {
   var __products_store: Record<string, Product> | undefined;
 }
 
-let products: Record<string, Product>;
-
-// Initialize products store
-if (typeof global.__products_store !== 'undefined') {
-  products = global.__products_store;
-} else {
-  // Import the products from the module
-  const productsModule = require('@/lib/products');
-  products = productsModule.products;
-  global.__products_store = products;
-}
+// Use the global store directly
+const products = global.__products_store || productsStore;
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,9 +64,12 @@ export async function POST(request: NextRequest) {
       searchKeywords: searchKeywords || [],
     };
 
-    // Store product
+    // Store product in global store
+    if (!global.__products_store) {
+      global.__products_store = products;
+    }
+    global.__products_store[id] = product;
     products[id] = product;
-    global.__products_store = products;
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error: any) {

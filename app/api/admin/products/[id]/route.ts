@@ -3,21 +3,16 @@ import { getTokenFromRequest } from '@/lib/jwt';
 import { requireAdmin } from '@/lib/admin';
 import { getProductById, Product } from '@/lib/products';
 
-// In-memory product store (for admin operations)
+// Import products from lib/products which uses global store
+import { products as productsStore } from '@/lib/products';
+
+// Get reference to the global store
 declare global {
   var __products_store: Record<string, Product> | undefined;
 }
 
-let products: Record<string, Product>;
-
-// Initialize products store
-if (typeof global.__products_store !== 'undefined') {
-  products = global.__products_store;
-} else {
-  const productsModule = require('@/lib/products');
-  products = productsModule.products;
-  global.__products_store = products;
-}
+// Use the global store directly
+const products = global.__products_store || productsStore;
 
 export async function GET(
   request: NextRequest,
@@ -73,8 +68,13 @@ export async function PATCH(
       inStock: body.sizes?.some((s: any) => s.available) ?? product.inStock,
     };
 
+    // Update both the global store and ensure it's synced
+    if (!global.__products_store) {
+      global.__products_store = products;
+    }
+    global.__products_store[params.id] = updatedProduct;
+    // Also update the local reference
     products[params.id] = updatedProduct;
-    global.__products_store = products;
 
     return NextResponse.json({ product: updatedProduct });
   } catch (error: any) {
@@ -102,8 +102,11 @@ export async function DELETE(
       );
     }
 
+    // Delete from both the global store and local reference
+    if (global.__products_store) {
+      delete global.__products_store[params.id];
+    }
     delete products[params.id];
-    global.__products_store = products;
 
     return NextResponse.json({ message: 'Product deleted successfully' });
   } catch (error: any) {
