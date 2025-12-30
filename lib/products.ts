@@ -443,11 +443,14 @@ export function searchProducts(query: string, filters?: {
 }): Product[] {
   const searchTerm = query.toLowerCase().trim();
   
+  // Always read from the global store to get latest updates
+  const currentProducts = global.__products_store || products;
+  
   if (!searchTerm && !filters) {
-    return getAllProducts();
+    return Object.values(currentProducts);
   }
 
-  let results = getAllProducts();
+  let results = Object.values(currentProducts);
 
   // Text search
   if (searchTerm) {

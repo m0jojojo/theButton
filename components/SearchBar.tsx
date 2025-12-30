@@ -179,13 +179,17 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
               >
                 {/* Product Image */}
                 <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-gray-100">
-                  {product.images[0] ? (
+                  {product.images && product.images.length > 0 && product.images[0] ? (
                     product.images[0].startsWith('data:') ? (
                       // Base64 data URL - use regular img tag
                       <img
                         src={product.images[0]}
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Image load error in SearchBar:', product.images[0]);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
                     ) : product.images[0].startsWith('http') ? (
                       // HTTP/HTTPS URL - use Next.js Image
