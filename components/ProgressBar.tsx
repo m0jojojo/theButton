@@ -1,7 +1,7 @@
 'use client';
 
 interface ProgressBarProps {
-  currentStep: 'cart' | 'address' | 'payment';
+  currentStep: 'cart' | 'address' | 'payment' | 'success';
 }
 
 export default function ProgressBar({ currentStep }: ProgressBarProps) {
