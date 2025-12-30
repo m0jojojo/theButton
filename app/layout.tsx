@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/contexts/CartContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Analytics from "@/components/Analytics";
 import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 
@@ -90,13 +91,15 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         <Analytics />
         <ErrorBoundaryWrapper>
-          <CartProvider>
-            <Header />
-            <main className="min-h-screen" id="main-content">
-              {children}
-            </main>
-            <Footer />
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Header />
+              <main className="min-h-screen" id="main-content">
+                {children}
+              </main>
+              <Footer />
+            </CartProvider>
+          </AuthProvider>
         </ErrorBoundaryWrapper>
       </body>
     </html>
