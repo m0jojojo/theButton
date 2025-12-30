@@ -21,17 +21,28 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 group cursor-zoom-in">
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300"
-          onClick={handleImageClick}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
+        {images[selectedImage] && images[selectedImage].startsWith('http') ? (
+          <Image
+            src={images[selectedImage]}
+            alt={`${productName} - Image ${selectedImage + 1}`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={selectedImage === 0}
+            onClick={handleImageClick}
+            quality={90}
+          />
+        ) : (
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center cursor-pointer"
+            onClick={handleImageClick}
+          >
             <span className="text-gray-500 text-sm">Product Image {selectedImage + 1}</span>
           </div>
-        </div>
+        )}
         
         {/* Zoom indicator */}
-        <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           Click to zoom
         </div>
       </div>
@@ -49,12 +60,22 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                   : 'border-transparent hover:border-gray-300'
               }`}
               aria-label={`View ${productName} image ${index + 1}`}
+              aria-pressed={selectedImage === index}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300">
-                <div className="absolute inset-0 flex items-center justify-center">
+              {image && image.startsWith('http') ? (
+                <Image
+                  src={image}
+                  alt={`${productName} thumbnail ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 25vw, 20vw"
+                  quality={75}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                   <span className="text-gray-400 text-xs">{index + 1}</span>
                 </div>
-              </div>
+              )}
             </button>
           ))}
         </div>
@@ -77,11 +98,21 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               className="relative max-w-4xl w-full aspect-square"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg">
-                <div className="absolute inset-0 flex items-center justify-center">
+              {images[selectedImage] && images[selectedImage].startsWith('http') ? (
+                <Image
+                  src={images[selectedImage]}
+                  alt={`${productName} - Zoomed view`}
+                  fill
+                  className="object-contain rounded-lg"
+                  sizes="90vw"
+                  quality={100}
+                  priority
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
                   <span className="text-white text-lg">Zoomed Image {selectedImage + 1}</span>
                 </div>
-              </div>
+              )}
               <button
                 onClick={() => setIsZoomed(false)}
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"

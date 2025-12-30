@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 // Mock data - will be replaced with Shopify API in Phase 3+
@@ -102,13 +103,23 @@ export default function CollectionPage({
               key={product.id}
               href={`/products/${product.id}`}
               className="group"
+              aria-label={`View ${product.name} - ${formatPrice(product.price)}`}
             >
               <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-3">
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-colors" />
-                {/* Placeholder for product image */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">Product Image</span>
-                </div>
+                {product.image && product.image.startsWith('http') ? (
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    quality={80}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-colors flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">Product Image</span>
+                  </div>
+                )}
               </div>
               <h3 className="font-semibold text-sm md:text-base mb-1 line-clamp-2 group-hover:text-gray-600 transition-colors">
                 {product.name}

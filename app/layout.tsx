@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/contexts/CartContext";
 import Analytics from "@/components/Analytics";
+import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -86,15 +87,17 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta name="theme-color" content="#ffffff" />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         <Analytics />
-        <CartProvider>
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </CartProvider>
+        <ErrorBoundaryWrapper>
+          <CartProvider>
+            <Header />
+            <main className="min-h-screen" id="main-content">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
+        </ErrorBoundaryWrapper>
       </body>
     </html>
   );
