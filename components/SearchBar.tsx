@@ -190,9 +190,22 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
                 <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-gray-100">
                   {(() => {
                     // Find first valid image (base64 or http/https URL)
-                    const validImage = product.images?.find((img: string) => 
+                    const allImages = product.images || [];
+                    const validImage = allImages.find((img: string) => 
                       img && (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://'))
                     );
+                    
+                    // Debug logging
+                    if (index === 0) {
+                      console.log('[SearchBar] Product image debug:', {
+                        productName: product.name,
+                        totalImages: allImages.length,
+                        firstImage: allImages[0]?.substring(0, 50) || 'none',
+                        foundValidImage: !!validImage,
+                        validImagePreview: validImage?.substring(0, 50) || 'none',
+                        allImages: allImages.map((img: string) => img?.substring(0, 30) || 'empty'),
+                      });
+                    }
                     
                     if (validImage) {
                       if (validImage.startsWith('data:')) {
@@ -203,8 +216,16 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
                             alt={product.name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              console.error('Image load error in SearchBar:', validImage.substring(0, 50));
+                              console.error('[SearchBar] Image load error:', {
+                                productName: product.name,
+                                imagePreview: validImage.substring(0, 50),
+                              });
                               (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                            onLoad={() => {
+                              if (index === 0) {
+                                console.log('[SearchBar] Image loaded successfully:', product.name);
+                              }
                             }}
                           />
                         );
