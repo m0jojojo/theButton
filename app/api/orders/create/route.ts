@@ -43,10 +43,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Create order
+    const normalizedEmail = payload.email.toLowerCase();
     const order = await createOrder({
       orderId,
       userId: payload.userId,
-      userEmail: payload.email, // Include email for stable matching
+      userEmail: normalizedEmail, // Include email for stable matching (normalized to lowercase)
       paymentMethod,
       paymentStatus: paymentStatus || (paymentMethod === 'cod' ? 'pending' : 'paid'),
       items,
@@ -56,7 +57,8 @@ export async function POST(request: NextRequest) {
       shippingAddress,
     });
 
-    console.log(`Order created: ${order.orderId} for user: ${payload.email} (ID: ${payload.userId})`);
+    console.log(`Order created: ${order.orderId} for user: ${normalizedEmail} (ID: ${payload.userId})`);
+    console.log(`Order stored with email: ${order.userEmail}`);
 
     // Return order
     return NextResponse.json(

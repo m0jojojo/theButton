@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's orders by email (stable across server restarts)
-    // Fallback to userId if email-based lookup fails
-    let userOrders = await getOrdersByUserEmail(payload.email);
+    // Normalize email to lowercase for consistent matching
+    let userOrders = await getOrdersByUserEmail(payload.email.toLowerCase());
     
     // If no orders found by email, try by userId (for backward compatibility)
     if (userOrders.length === 0) {

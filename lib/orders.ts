@@ -114,9 +114,11 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
 }
 
 export async function getOrdersByUserEmail(userEmail: string): Promise<Order[]> {
-  const userOrders = ordersByUserEmail.get(userEmail.toLowerCase()) || [];
-  console.log(`Getting orders for user email ${userEmail}: found ${userOrders.length} orders`);
+  const normalizedEmail = userEmail.toLowerCase();
+  const userOrders = ordersByUserEmail.get(normalizedEmail) || [];
+  console.log(`Getting orders for user email ${normalizedEmail}: found ${userOrders.length} orders`);
   console.log(`Total orders in store: ${orders.size}, Total users with orders (by email): ${ordersByUserEmail.size}`);
+  console.log(`Available email keys in ordersByUserEmail:`, Array.from(ordersByUserEmail.keys()));
   // Sort by date (newest first)
   return userOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
