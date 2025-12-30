@@ -40,15 +40,30 @@ export default function CartItem({ item }: CartItemProps) {
           className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg bg-gray-100 overflow-hidden hover:opacity-80 transition-opacity"
           aria-label={`View ${item.name}`}
         >
-          {item.image && item.image.startsWith('http') ? (
-            <Image
-              src={item.image}
-              alt={item.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 80px, 96px"
-              quality={75}
-            />
+          {item.image ? (
+            item.image.startsWith('data:') ? (
+              // Base64 data URL - use regular img tag
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-full object-cover"
+              />
+            ) : item.image.startsWith('http') ? (
+              // HTTP/HTTPS URL - use Next.js Image
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 80px, 96px"
+                quality={75}
+              />
+            ) : (
+              // Placeholder for invalid images
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                <span className="text-gray-400 text-xs">Image</span>
+              </div>
+            )
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
               <span className="text-gray-400 text-xs">Image</span>

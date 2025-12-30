@@ -21,17 +21,36 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 group cursor-zoom-in">
-        {images[selectedImage] && images[selectedImage].startsWith('http') ? (
-          <Image
-            src={images[selectedImage]}
-            alt={`${productName} - Image ${selectedImage + 1}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority={selectedImage === 0}
-            onClick={handleImageClick}
-            quality={90}
-          />
+        {images[selectedImage] ? (
+          images[selectedImage].startsWith('data:') ? (
+            // Base64 data URL - use regular img tag
+            <img
+              src={images[selectedImage]}
+              alt={`${productName} - Image ${selectedImage + 1}`}
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={handleImageClick}
+            />
+          ) : images[selectedImage].startsWith('http') ? (
+            // HTTP/HTTPS URL - use Next.js Image
+            <Image
+              src={images[selectedImage]}
+              alt={`${productName} - Image ${selectedImage + 1}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority={selectedImage === 0}
+              onClick={handleImageClick}
+              quality={90}
+            />
+          ) : (
+            // Placeholder for invalid images
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center cursor-pointer"
+              onClick={handleImageClick}
+            >
+              <span className="text-gray-500 text-sm">Product Image {selectedImage + 1}</span>
+            </div>
+          )
         ) : (
           <div
             className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center cursor-pointer"
@@ -62,15 +81,30 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               aria-label={`View ${productName} image ${index + 1}`}
               aria-pressed={selectedImage === index}
             >
-              {image && image.startsWith('http') ? (
-                <Image
-                  src={image}
-                  alt={`${productName} thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 25vw, 20vw"
-                  quality={75}
-                />
+              {image ? (
+                image.startsWith('data:') ? (
+                  // Base64 data URL - use regular img tag
+                  <img
+                    src={image}
+                    alt={`${productName} thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : image.startsWith('http') ? (
+                  // HTTP/HTTPS URL - use Next.js Image
+                  <Image
+                    src={image}
+                    alt={`${productName} thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 25vw, 20vw"
+                    quality={75}
+                  />
+                ) : (
+                  // Placeholder for invalid images
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">{index + 1}</span>
+                  </div>
+                )
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                   <span className="text-gray-400 text-xs">{index + 1}</span>
@@ -98,16 +132,31 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               className="relative max-w-4xl w-full aspect-square"
               onClick={(e) => e.stopPropagation()}
             >
-              {images[selectedImage] && images[selectedImage].startsWith('http') ? (
-                <Image
-                  src={images[selectedImage]}
-                  alt={`${productName} - Zoomed view`}
-                  fill
-                  className="object-contain rounded-lg"
-                  sizes="90vw"
-                  quality={100}
-                  priority
-                />
+              {images[selectedImage] ? (
+                images[selectedImage].startsWith('data:') ? (
+                  // Base64 data URL - use regular img tag
+                  <img
+                    src={images[selectedImage]}
+                    alt={`${productName} - Zoomed view`}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                ) : images[selectedImage].startsWith('http') ? (
+                  // HTTP/HTTPS URL - use Next.js Image
+                  <Image
+                    src={images[selectedImage]}
+                    alt={`${productName} - Zoomed view`}
+                    fill
+                    className="object-contain rounded-lg"
+                    sizes="90vw"
+                    quality={100}
+                    priority
+                  />
+                ) : (
+                  // Placeholder for invalid images
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-lg">Zoomed Image {selectedImage + 1}</span>
+                  </div>
+                )
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
                   <span className="text-white text-lg">Zoomed Image {selectedImage + 1}</span>
