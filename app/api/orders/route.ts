@@ -24,14 +24,18 @@ export async function GET(request: NextRequest) {
 
     // Get user's orders by email (stable across server restarts)
     // Normalize email to lowercase for consistent matching
-    let userOrders = await getOrdersByUserEmail(payload.email.toLowerCase());
+    const normalizedEmail = payload.email.toLowerCase();
+    console.log(`[GET /api/orders] Fetching orders for email: ${normalizedEmail} (original: ${payload.email}), userId: ${payload.userId}`);
+    
+    let userOrders = await getOrdersByUserEmail(normalizedEmail);
     
     // If no orders found by email, try by userId (for backward compatibility)
     if (userOrders.length === 0) {
+      console.log(`[GET /api/orders] No orders found by email, trying userId: ${payload.userId}`);
       userOrders = await getOrdersByUserId(payload.userId);
     }
     
-    console.log(`Fetching orders for user: ${payload.email} (ID: ${payload.userId}), found ${userOrders.length} orders`);
+    console.log(`[GET /api/orders] Found ${userOrders.length} orders for user: ${normalizedEmail} (ID: ${payload.userId})`);
 
     // Return orders
     return NextResponse.json({

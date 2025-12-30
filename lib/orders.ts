@@ -87,7 +87,11 @@ export async function createOrder(data: {
   userOrdersByEmail.push(order);
   ordersByUserEmail.set(order.userEmail, userOrdersByEmail);
 
-  console.log(`Order stored: ${order.orderId}, User ID: ${data.userId}, User Email: ${order.userEmail}, Total orders: ${userOrdersByEmail.length}`);
+  console.log(`[createOrder] Order stored: ${order.orderId}`);
+  console.log(`[createOrder] User ID: ${data.userId}, User Email: ${order.userEmail}`);
+  console.log(`[createOrder] Total orders for this email: ${userOrdersByEmail.length}`);
+  console.log(`[createOrder] Total orders in store: ${orders.size}`);
+  console.log(`[createOrder] Total unique emails with orders: ${ordersByUserEmail.size}`);
 
   return order;
 }
@@ -115,10 +119,14 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
 
 export async function getOrdersByUserEmail(userEmail: string): Promise<Order[]> {
   const normalizedEmail = userEmail.toLowerCase();
+  console.log(`[getOrdersByUserEmail] Looking up orders for email: ${normalizedEmail}`);
+  console.log(`[getOrdersByUserEmail] Total orders in store: ${orders.size}`);
+  console.log(`[getOrdersByUserEmail] Total unique emails with orders: ${ordersByUserEmail.size}`);
+  console.log(`[getOrdersByUserEmail] Available email keys:`, Array.from(ordersByUserEmail.keys()));
+  
   const userOrders = ordersByUserEmail.get(normalizedEmail) || [];
-  console.log(`Getting orders for user email ${normalizedEmail}: found ${userOrders.length} orders`);
-  console.log(`Total orders in store: ${orders.size}, Total users with orders (by email): ${ordersByUserEmail.size}`);
-  console.log(`Available email keys in ordersByUserEmail:`, Array.from(ordersByUserEmail.keys()));
+  console.log(`[getOrdersByUserEmail] Found ${userOrders.length} orders for email: ${normalizedEmail}`);
+  
   // Sort by date (newest first)
   return userOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
