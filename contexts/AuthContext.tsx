@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { isTokenValid } from '@/lib/jwt-client';
 
 export interface User {
   id: string;
@@ -35,17 +36,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const savedUser = localStorage.getItem('theButton_user');
 
       if (savedToken && savedUser) {
-        setToken(savedToken);
-        setUser(JSON.parse(savedUser));
-        // Verify token is still valid
-        verifyToken(savedToken);
+        try {
+          // First, check if token is valid (not expired and properly formatted)
+          // This is a client-side check that doesn't require the secret
+          if (!isTokenValid(savedToken)) {
+            // Token is invalid (expired or malformed), clear session
+            console.log('Token is invalid or expired');
+            logout();
+            setIsLoading(false);
+            return;
+          }
+
+          // Token is valid, restore user immediately from localStorage
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+          setToken(savedToken);
+          setIsLoading(false); // Set loading to false immediately so UI shows user
+          
+          // Verify token with server in background (non-blocking)
+          // This updates user data if server has it, but doesn't clear session if server restarted
+          verifyTokenWithServer(savedToken);
+        } catch (error) {
+          console.error('Error parsing saved user:', error);
+          // If parsing fails, clear corrupted data
+          logout();
+          setIsLoading(false);
+        }
       } else {
         setIsLoading(false);
       }
     }
   }, []);
 
-  const verifyToken = async (tokenToVerify: string) => {
+  const verifyTokenWithServer = async (tokenToVerify: string) => {
     try {
       const response = await fetch('/api/auth/me', {
         headers: {
@@ -55,21 +78,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
+        // Update user data from server (in case it changed)
         setUser(data.user);
-        setToken(tokenToVerify);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('theButton_token', tokenToVerify);
           localStorage.setItem('theButton_user', JSON.stringify(data.user));
         }
-      } else {
-        // Token invalid, clear auth
+      } else if (response.status === 401) {
+        // Token is definitely invalid (unauthorized), clear session
+        console.log('Token unauthorized, clearing session');
         logout();
+      } else {
+        // Other errors (like 404 - user not found due to server restart)
+        // Keep the session since the JWT token itself is valid
+        // User might need to re-register, but they stay logged in
+        console.log('Server verification failed, but keeping session (server may have restarted)');
       }
     } catch (error) {
       console.error('Token verification error:', error);
-      logout();
-    } finally {
-      setIsLoading(false);
+      // Network errors shouldn't clear the session
+      // Keep the user logged in if it's just a network issue
     }
   };
 
