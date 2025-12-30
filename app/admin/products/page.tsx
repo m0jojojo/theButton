@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import AdminGuard from '@/components/AdminGuard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
-import { getAllProducts, Product } from '@/lib/products';
+import { Product } from '@/lib/products';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -12,16 +12,63 @@ export default function AdminProductsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    try {
-      const allProducts = getAllProducts();
-      setProducts(allProducts);
-    } catch (err) {
-      console.error('Error fetching products:', err);
-      setError('Failed to load products');
-    } finally {
-      setIsLoading(false);
-    }
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem('theButton_token');
+        const response = await fetch('/api/admin/products', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+
+        const data = await response.json();
+        setProducts(data.products || []);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
+
+  const handleDelete = async (productId: string) => {
+    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('theButton_token');
+      const response = await fetch(`/api/admin/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
+      }
+
+      // Refresh products list
+      const productsResponse = await fetch('/api/admin/products', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await productsResponse.json();
+      setProducts(data.products || []);
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      alert('Failed to delete product');
+    }
+  };
 
   return (
     <AdminGuard>
@@ -167,11 +214,15 @@ export default function AdminProductsPage() {
                               <Link
                                 href={`/products/${product.id}`}
                                 className="text-gray-900 hover:text-gray-600 transition-colors mr-4"
+                                target="_blank"
                               >
                                 View
                               </Link>
-                              <button className="text-gray-900 hover:text-gray-600 transition-colors">
-                                Edit
+                              <button
+                                onClick={() => handleDelete(product.id)}
+                                className="text-red-600 hover:text-red-800 transition-colors ml-4"
+                              >
+                                Delete
                               </button>
                             </td>
                           </tr>
