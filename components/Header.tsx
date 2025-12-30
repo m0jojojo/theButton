@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
+import SearchBar from './SearchBar';
 
 const navLinks = [
   { name: 'New Arrivals', href: '/collections/new-arrivals' },
@@ -65,25 +66,10 @@ export default function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
-            {/* Search icon - placeholder for Phase 3+ */}
-            <button
-              aria-label="Search"
-              className="hidden md:block p-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button>
+            {/* Search Bar - Desktop */}
+            <div className="hidden md:block">
+              <SearchBar />
+            </div>
 
             {/* Cart icon */}
             <Link
@@ -162,6 +148,10 @@ export default function Header() {
             className="md:hidden border-t border-gray-200 bg-white"
           >
             <div className="container mx-auto px-4 py-4 space-y-3">
+              {/* Mobile Search Bar */}
+              <div className="pb-3 border-b border-gray-200">
+                <SearchBar mobile onClose={() => setMobileMenuOpen(false)} />
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
