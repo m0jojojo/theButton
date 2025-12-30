@@ -406,14 +406,32 @@ const defaultProducts: Record<string, Product> = {
   },
 };
 
+// Initialize or reuse existing store (persists across hot reloads)
+let products: Record<string, Product>;
+if (typeof global.__products_store !== 'undefined') {
+  products = global.__products_store;
+  console.log(`[products.ts] Reusing existing store - Total products: ${Object.keys(products).length}`);
+} else {
+  products = defaultProducts;
+  global.__products_store = products;
+  console.log(`[products.ts] Initialized new store - Total products: ${Object.keys(products).length}`);
+}
+
+// Export products for backward compatibility
+export { products };
+
 // Get all products as array
 export function getAllProducts(): Product[] {
-  return Object.values(products);
+  // Always read from the global store to get latest updates
+  const currentProducts = global.__products_store || products;
+  return Object.values(currentProducts);
 }
 
 // Get product by ID
 export function getProductById(id: string): Product | undefined {
-  return products[id];
+  // Always read from the global store to get latest updates
+  const currentProducts = global.__products_store || products;
+  return currentProducts[id];
 }
 
 // Search products
