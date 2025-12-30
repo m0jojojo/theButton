@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import ProgressBar from '@/components/ProgressBar';
 import CheckoutForm from '@/components/CheckoutForm';
 import OrderSummary from '@/components/OrderSummary';
+import { trackInitiateCheckout } from '@/lib/analytics';
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCart();
@@ -13,6 +14,10 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isOrderComplete, setIsOrderComplete] = useState(false);
+
+  const subtotal = getTotal();
+  const shipping = subtotal >= 2000 ? 0 : 99;
+  const total = subtotal + shipping;
 
   useEffect(() => {
     setMounted(true);
@@ -22,9 +27,23 @@ export default function CheckoutPage() {
     }
   }, [items.length, router, isOrderComplete, mounted]);
 
-  const subtotal = getTotal();
-  const shipping = subtotal >= 2000 ? 0 : 99;
-  const total = subtotal + shipping;
+  // Track Initiate Checkout when page loads
+  useEffect(() => {
+    if (mounted && items.length > 0) {
+      trackInitiateCheckout({
+        value: total,
+        currency: 'INR',
+        num_items: items.reduce((sum, item) => sum + item.quantity, 0),
+        items: items.map((item) => ({
+          id: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          category: item.name.split(' ')[0],
+        })),
+      });
+    }
+  }, [mounted, items, total]);
 
   if (!mounted || (items.length === 0 && !isOrderComplete)) {
     return null;

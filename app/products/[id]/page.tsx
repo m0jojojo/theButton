@@ -3,6 +3,7 @@ import ImageGallery from '@/components/ImageGallery';
 import ProductInfo from '@/components/ProductInfo';
 import StickyAddToCart from '@/components/StickyAddToCart';
 import StickyWhatsApp from '@/components/StickyWhatsApp';
+import ProductViewTracker from '@/components/ProductViewTracker';
 
 // Mock product data - will be replaced with Shopify API
 const products: Record<string, any> = {
@@ -409,6 +410,7 @@ export default function ProductPage({
 
   return (
     <>
+      <ProductViewTracker product={product} />
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Image Gallery */}

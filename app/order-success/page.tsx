@@ -2,24 +2,64 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
+import { trackPurchase, trackWhatsAppClick } from '@/lib/analytics';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
-  const { clearCart } = useCart();
+  const { clearCart, items, getTotal } = useCart();
+  const [hasTracked, setHasTracked] = useState(false);
+  const [hasCleared, setHasCleared] = useState(false);
 
-  // Clear cart when order success page loads
+  // Track purchase when order success page loads
   useEffect(() => {
-    clearCart();
-  }, [clearCart]);
+    if (orderId && items.length > 0 && !hasTracked) {
+      const total = getTotal();
+      const shipping = total >= 2000 ? 0 : 99;
+      const finalTotal = total + shipping;
+
+      // Track purchase event
+      trackPurchase({
+        orderId,
+        value: finalTotal,
+        currency: 'INR',
+        items: items.map((item) => ({
+          id: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          category: item.name.split(' ')[0],
+          sku: item.productId,
+        })),
+      });
+
+      setHasTracked(true);
+    }
+  }, [orderId, items, getTotal, hasTracked]);
+
+  // Clear cart once after tracking is done
+  useEffect(() => {
+    if (hasTracked && !hasCleared) {
+      clearCart();
+      setHasCleared(true);
+    }
+  }, [hasTracked, hasCleared, clearCart]);
 
   const whatsappMessage = encodeURIComponent(
     `Hi! I just placed an order.\n\nOrder ID: ${orderId || 'N/A'}\n\nCan you confirm the order details and estimated delivery time?`
   );
 
   const whatsappUrl = `https://wa.me/919876543210?text=${whatsappMessage}`;
+
+  const handleWhatsAppClick = () => {
+    trackWhatsAppClick({
+      productId: orderId || undefined,
+      productName: 'Order Support',
+      page: 'order-success',
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
@@ -93,6 +133,7 @@ function OrderSuccessContent() {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleWhatsAppClick}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

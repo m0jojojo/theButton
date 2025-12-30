@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 interface StickyWhatsAppProps {
   product: {
@@ -41,6 +42,14 @@ export default function StickyWhatsApp({ product }: StickyWhatsAppProps) {
 
   const whatsappUrl = `https://wa.me/919876543210?text=${whatsappMessage}`;
 
+  const handleWhatsAppClick = () => {
+    trackWhatsAppClick({
+      productId: product.id,
+      productName: product.name,
+      page: pathname || 'product',
+    });
+  };
+
   // Only show on product pages
   if (!pathname?.startsWith('/products/')) {
     return null;
@@ -53,6 +62,7 @@ export default function StickyWhatsApp({ product }: StickyWhatsAppProps) {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleWhatsAppClick}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}

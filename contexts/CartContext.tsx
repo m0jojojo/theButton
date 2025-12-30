@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { trackAddToCart } from '@/lib/analytics';
 
 export interface CartItem {
   id: string;
@@ -65,11 +66,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
         (i) => i.productId === item.productId && i.size === item.size
       );
 
+      let updatedItems: CartItem[];
+      let quantityToTrack = 1;
+
       if (existingItem) {
         // Update quantity
-        return prevItems.map((i) =>
+        quantityToTrack = existingItem.quantity + 1;
+        updatedItems = prevItems.map((i) =>
           i.id === existingItem.id
-            ? { ...i, quantity: i.quantity + 1 }
+            ? { ...i, quantity: quantityToTrack }
             : i
         );
       } else {
@@ -79,8 +84,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
           id: `${item.productId}-${item.size}-${Date.now()}`,
           quantity: 1,
         };
-        return [...prevItems, newItem];
+        updatedItems = [...prevItems, newItem];
       }
+
+      // Track Add to Cart event
+      trackAddToCart({
+        id: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: quantityToTrack,
+        size: item.size,
+        category: item.name.split(' ')[0], // Extract category from name or use collection
+      });
+
+      return updatedItems;
     });
   };
 
