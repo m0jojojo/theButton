@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromRequest } from '@/lib/jwt';
 import { requireAdmin } from '@/lib/admin';
-import { getAllProducts, getProductById, Product } from '@/lib/products';
-
-// Import products from lib/products which uses global store
-import { products as productsStore } from '@/lib/products';
-
-// Get reference to the global store
-declare global {
-  var __products_store: Record<string, Product> | undefined;
-}
-
-// Use the global store directly
-const products = global.__products_store || productsStore;
+import { getAllProducts, saveProduct, Product } from '@/lib/products';
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,6 +38,17 @@ export async function POST(request: NextRequest) {
     // Generate ID
     const id = `product_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+    // Clean up images - filter out placeholder paths
+    const cleanImages = (images: string[]): string[] => {
+      return images.filter((img: string) => 
+        img && (
+          img.startsWith('data:') || 
+          img.startsWith('http://') || 
+          img.startsWith('https://')
+        ) && !img.includes('placeholder-product.jpg')
+      );
+    };
+
     // Create product
     const product: Product = {
       id,
@@ -56,20 +56,22 @@ export async function POST(request: NextRequest) {
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
       description,
-      images: images || [],
+      images: cleanImages(images || []),
       sizes: sizes || [],
-      inStock: sizes?.some((s: any) => s.available) || false,
+      inStock: sizes?.some((s: any) => s.available && s.stock > 0) || false,
       sku,
       collection,
       searchKeywords: searchKeywords || [],
     };
 
-    // Store product in global store
-    if (!global.__products_store) {
-      global.__products_store = products;
-    }
-    global.__products_store[id] = product;
-    products[id] = product;
+    // Use saveProduct to ensure proper storage
+    saveProduct(product);
+
+    console.log('[POST /api/admin/products] Created product:', {
+      id: product.id,
+      name: product.name,
+      imageCount: product.images?.length || 0,
+    });
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error: any) {
