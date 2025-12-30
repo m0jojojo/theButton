@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import SizeSelector from './SizeSelector';
 import { motion } from 'framer-motion';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductInfoProps {
   product: {
@@ -15,12 +17,15 @@ interface ProductInfoProps {
     inStock: boolean;
     sku: string;
     collection: string;
+    images?: string[];
   };
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+  const { addItem } = useCart();
+  const router = useRouter();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -36,12 +41,28 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert('Please select a size');
+      // Scroll to size selector
+      const sizeSelector = document.querySelector('[data-size-selector]');
+      if (sizeSelector) {
+        sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        sizeSelector.classList.add('ring-2', 'ring-gray-900', 'ring-offset-2');
+        setTimeout(() => {
+          sizeSelector.classList.remove('ring-2', 'ring-gray-900', 'ring-offset-2');
+        }, 2000);
+      }
       return;
     }
     
-    // Placeholder - will be implemented in Phase 4
-    console.log('Add to cart:', { productId: product.id, size: selectedSize });
+    // Add to cart
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      compareAtPrice: product.compareAtPrice,
+      size: selectedSize,
+      image: product.images?.[0] || '/placeholder-product.jpg',
+    });
+    
     setShowAddedToCart(true);
     setTimeout(() => setShowAddedToCart(false), 2000);
   };

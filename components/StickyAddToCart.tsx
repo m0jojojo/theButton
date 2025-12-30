@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { useCart } from '@/contexts/CartContext';
 
 interface StickyAddToCartProps {
   product: {
@@ -12,6 +13,7 @@ interface StickyAddToCartProps {
     compareAtPrice?: number;
     sizes: Array<{ value: string; available: boolean; stock: number }>;
     inStock: boolean;
+    images?: string[];
   };
 }
 
@@ -20,6 +22,7 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [showAdded, setShowAdded] = useState(false);
   const pathname = usePathname();
+  const { addItem } = useCart();
 
   useEffect(() => {
     // Show sticky bar after scrolling past initial viewport
@@ -56,8 +59,16 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
       return;
     }
     
-    // Placeholder - will be implemented in Phase 4
-    console.log('Add to cart:', { productId: product.id, size: selectedSize });
+    // Add to cart
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      compareAtPrice: product.compareAtPrice,
+      size: selectedSize,
+      image: product.images?.[0] || '/placeholder-product.jpg',
+    });
+    
     setShowAdded(true);
     setTimeout(() => setShowAdded(false), 2000);
   };

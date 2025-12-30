@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '@/contexts/CartContext';
 
 const navLinks = [
   { name: 'New Arrivals', href: '/collections/new-arrivals' },
@@ -14,6 +15,8 @@ const navLinks = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { getItemCount } = useCart();
+  const cartCount = getItemCount();
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -22,9 +25,29 @@ export default function Header() {
           {/* Logo */}
           <Link 
             href="/" 
-            className="text-2xl md:text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 text-2xl md:text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity text-gray-900"
           >
-            The Button
+            <span className="flex items-baseline">
+              <span>THE</span>
+              <span className="ml-2 md:ml-3">BUTT</span>
+              {/* Button Icon replacing O */}
+              <span className="relative inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 mx-1">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-full h-full text-gray-900"
+                  fill="currentColor"
+                >
+                  {/* Outer circle */}
+                  <circle cx="12" cy="12" r="10" fill="currentColor" />
+                  {/* Button holes - 4 dots in square pattern */}
+                  <circle cx="9" cy="9" r="1.5" fill="white" />
+                  <circle cx="15" cy="9" r="1.5" fill="white" />
+                  <circle cx="9" cy="15" r="1.5" fill="white" />
+                  <circle cx="15" cy="15" r="1.5" fill="white" />
+                </svg>
+              </span>
+              <span>N</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -62,7 +85,7 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* Cart icon - placeholder for Phase 4+ */}
+            {/* Cart icon */}
             <Link
               href="/cart"
               aria-label="Shopping cart"
@@ -81,6 +104,11 @@ export default function Header() {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
+              )}
             </Link>
 
             {/* Mobile menu button */}
