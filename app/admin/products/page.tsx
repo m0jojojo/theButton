@@ -136,9 +136,12 @@ export default function AdminProductsPage() {
         <main className="container mx-auto px-4 py-8">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">All Products</h2>
-            <button className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+            <Link
+              href="/admin/products/new"
+              className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+            >
               Add Product
-            </button>
+            </Link>
           </div>
 
           {isLoading ? (
