@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromRequest } from '@/lib/jwt';
 import { requireAdmin } from '@/lib/admin';
-import { getProductById, Product } from '@/lib/products';
-
-// Import products from lib/products which uses global store
-import { products as productsStore } from '@/lib/products';
+import { getProductById, saveProduct, deleteProduct, Product } from '@/lib/products';
 
 // Get reference to the global store
 declare global {
@@ -58,23 +55,30 @@ export async function PATCH(
       );
     }
 
-    // Update product
+    // Update product - ensure images are preserved
     const updatedProduct: Product = {
       ...product,
       ...body,
       id: params.id, // Ensure ID doesn't change
       price: body.price !== undefined ? Number(body.price) : product.price,
       compareAtPrice: body.compareAtPrice !== undefined ? Number(body.compareAtPrice) : product.compareAtPrice,
-      inStock: body.sizes?.some((s: any) => s.available) ?? product.inStock,
+      inStock: body.sizes?.some((s: any) => s.available && s.stock > 0) ?? product.inStock,
+      // Ensure images array is preserved
+      images: body.images && Array.isArray(body.images) && body.images.length > 0 
+        ? body.images 
+        : product.images || [],
     };
 
-    // Update both the global store and ensure it's synced
-    if (!global.__products_store) {
-      global.__products_store = products;
-    }
-    global.__products_store[params.id] = updatedProduct;
-    // Also update the local reference
-    products[params.id] = updatedProduct;
+    // Use saveProduct to ensure proper storage
+    saveProduct(updatedProduct);
+
+    // Debug log
+    console.log('[PATCH /api/admin/products/[id]] Updated product:', {
+      id: updatedProduct.id,
+      name: updatedProduct.name,
+      imageCount: updatedProduct.images?.length || 0,
+      firstImagePreview: updatedProduct.images?.[0]?.substring(0, 50) || 'none',
+    });
 
     return NextResponse.json({ product: updatedProduct });
   } catch (error: any) {

@@ -32,6 +32,15 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
 
     const timer = setTimeout(() => {
       const results = searchProducts(query, undefined).slice(0, 5); // Top 5 suggestions
+      // Debug: Log first result's image data
+      if (results.length > 0) {
+        console.log('[SearchBar] First result:', {
+          name: results[0].name,
+          hasImages: !!results[0].images,
+          imageCount: results[0].images?.length || 0,
+          firstImage: results[0].images?.[0]?.substring(0, 50) || 'none',
+        });
+      }
       setSuggestions(results);
       setIsOpen(results.length > 0);
     }, 200);

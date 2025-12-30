@@ -434,6 +434,25 @@ export function getProductById(id: string): Product | undefined {
   return currentProducts[id];
 }
 
+// Add/Update product (for admin)
+export function saveProduct(product: Product): Product {
+  const currentProducts = global.__products_store || products;
+  currentProducts[product.id] = product;
+  global.__products_store = currentProducts; // Ensure global reference is updated
+  return product;
+}
+
+// Delete product (for admin)
+export function deleteProduct(id: string): boolean {
+  const currentProducts = global.__products_store || products;
+  if (currentProducts[id]) {
+    delete currentProducts[id];
+    global.__products_store = currentProducts; // Ensure global reference is updated
+    return true;
+  }
+  return false;
+}
+
 // Search products
 export function searchProducts(query: string, filters?: {
   collection?: string;
