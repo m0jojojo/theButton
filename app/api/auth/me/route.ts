@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromRequest, verifyToken } from '@/lib/jwt';
-import { getUserById, getUserPublic } from '@/lib/users';
+import { getUserById, getUserByEmail, getUserPublic } from '@/lib/users';
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,13 +22,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user
-    const user = await getUserById(payload.userId);
+    // Get user by email first (stable across server restarts), then by ID
+    let user = await getUserByEmail(payload.email);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      // Fallback to userId lookup (for backward compatibility)
+      user = await getUserById(payload.userId);
+    }
+    
+    if (!user) {
+      // User doesn't exist (server restarted), but token is valid
+      // Return a minimal user object based on token payload
+      return NextResponse.json({
+        user: {
+          id: payload.userId,
+          email: payload.email,
+          name: payload.email.split('@')[0], // Use email prefix as name
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      });
     }
 
     // Return user

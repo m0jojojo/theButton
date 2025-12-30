@@ -17,7 +17,8 @@ export interface OrderItem {
 export interface Order {
   id: string;
   orderId: string; // Display order ID (e.g., ORD-1234567890-ABC)
-  userId: string;
+  userId: string; // Keep for backward compatibility
+  userEmail: string; // Use email for matching (stable across server restarts)
   status: OrderStatus;
   paymentMethod: 'razorpay' | 'cod';
   paymentStatus: 'pending' | 'paid' | 'failed';
@@ -42,10 +43,12 @@ export interface Order {
 // In-memory order store (replace with database)
 const orders: Map<string, Order> = new Map();
 const ordersByUserId: Map<string, Order[]> = new Map();
+const ordersByUserEmail: Map<string, Order[]> = new Map(); // Use email for matching
 
 export async function createOrder(data: {
   orderId: string;
   userId: string;
+  userEmail: string; // Add email to order data
   paymentMethod: 'razorpay' | 'cod';
   paymentStatus: 'pending' | 'paid' | 'failed';
   items: OrderItem[];
@@ -58,6 +61,7 @@ export async function createOrder(data: {
     id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     orderId: data.orderId,
     userId: data.userId,
+    userEmail: data.userEmail.toLowerCase(), // Store email in lowercase
     status: data.paymentMethod === 'cod' ? 'pending' : 'confirmed',
     paymentMethod: data.paymentMethod,
     paymentStatus: data.paymentStatus,
@@ -73,12 +77,17 @@ export async function createOrder(data: {
   // Store order
   orders.set(order.id, order);
 
-  // Store by user ID
-  const userOrders = ordersByUserId.get(data.userId) || [];
-  userOrders.push(order);
-  ordersByUserId.set(data.userId, userOrders);
+  // Store by user ID (for backward compatibility)
+  const userOrdersById = ordersByUserId.get(data.userId) || [];
+  userOrdersById.push(order);
+  ordersByUserId.set(data.userId, userOrdersById);
 
-  console.log(`Order stored: ${order.orderId}, User: ${data.userId}, Total orders for user: ${userOrders.length}`);
+  // Store by user email (primary method - stable across server restarts)
+  const userOrdersByEmail = ordersByUserEmail.get(order.userEmail) || [];
+  userOrdersByEmail.push(order);
+  ordersByUserEmail.set(order.userEmail, userOrdersByEmail);
+
+  console.log(`Order stored: ${order.orderId}, User ID: ${data.userId}, User Email: ${order.userEmail}, Total orders: ${userOrdersByEmail.length}`);
 
   return order;
 }
@@ -98,8 +107,16 @@ export async function getOrderByOrderId(orderId: string): Promise<Order | null> 
 
 export async function getOrdersByUserId(userId: string): Promise<Order[]> {
   const userOrders = ordersByUserId.get(userId) || [];
-  console.log(`Getting orders for user ${userId}: found ${userOrders.length} orders`);
+  console.log(`Getting orders for user ID ${userId}: found ${userOrders.length} orders`);
   console.log(`Total orders in store: ${orders.size}, Total users with orders: ${ordersByUserId.size}`);
+  // Sort by date (newest first)
+  return userOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function getOrdersByUserEmail(userEmail: string): Promise<Order[]> {
+  const userOrders = ordersByUserEmail.get(userEmail.toLowerCase()) || [];
+  console.log(`Getting orders for user email ${userEmail}: found ${userOrders.length} orders`);
+  console.log(`Total orders in store: ${orders.size}, Total users with orders (by email): ${ordersByUserEmail.size}`);
   // Sort by date (newest first)
   return userOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }

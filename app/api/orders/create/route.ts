@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
     const order = await createOrder({
       orderId,
       userId: payload.userId,
+      userEmail: payload.email, // Include email for stable matching
       paymentMethod,
       paymentStatus: paymentStatus || (paymentMethod === 'cod' ? 'pending' : 'paid'),
       items,
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       shippingAddress,
     });
 
-    console.log(`Order created: ${order.orderId} for user: ${payload.userId}`);
+    console.log(`Order created: ${order.orderId} for user: ${payload.email} (ID: ${payload.userId})`);
 
     // Return order
     return NextResponse.json(

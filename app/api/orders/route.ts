@@ -22,10 +22,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user's orders
-    const userOrders = await getOrdersByUserId(payload.userId);
+    // Get user's orders by email (stable across server restarts)
+    // Fallback to userId if email-based lookup fails
+    let userOrders = await getOrdersByUserEmail(payload.email);
     
-    console.log(`Fetching orders for user: ${payload.userId}, found ${userOrders.length} orders`);
+    // If no orders found by email, try by userId (for backward compatibility)
+    if (userOrders.length === 0) {
+      userOrders = await getOrdersByUserId(payload.userId);
+    }
+    
+    console.log(`Fetching orders for user: ${payload.email} (ID: ${payload.userId}), found ${userOrders.length} orders`);
 
     // Return orders
     return NextResponse.json({

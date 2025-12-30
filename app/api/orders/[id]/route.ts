@@ -34,8 +34,8 @@ export async function GET(
       );
     }
 
-    // Verify order belongs to user
-    if (order.userId !== payload.userId) {
+    // Verify order belongs to user (check by email first, then userId for backward compatibility)
+    if (order.userEmail?.toLowerCase() !== payload.email.toLowerCase() && order.userId !== payload.userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
