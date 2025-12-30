@@ -190,10 +190,11 @@ export async function updateOrderPaymentStatus(
 
 // Helper to get order without sensitive data
 export function getOrderPublic(order: Order) {
+  const { id, ...publicOrder } = order; // Remove internal ID
   return {
-    ...order,
-    createdAt: order.createdAt.toISOString(),
-    updatedAt: order.updatedAt.toISOString(),
+    ...publicOrder,
+    createdAt: publicOrder.createdAt.toISOString(),
+    updatedAt: publicOrder.updatedAt.toISOString(),
   };
 }
 
