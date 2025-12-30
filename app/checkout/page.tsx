@@ -30,10 +30,10 @@ export default function CheckoutPage() {
     return null;
   }
 
-  const handleOrderSuccess = (orderId: string) => {
+  const handleOrderSuccess = (orderId: string, phone: string) => {
     setIsOrderComplete(true);
-    // Redirect first, cart will be cleared on order success page
-    router.replace(`/order-success?orderId=${orderId}`);
+    // Redirect to OTP verification page
+    router.replace(`/verify-otp?orderId=${orderId}&phone=${phone}`);
   };
 
   return (

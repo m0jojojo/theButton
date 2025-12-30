@@ -5,7 +5,7 @@ import { initiateRazorpayPayment, createRazorpayOrder } from '@/lib/razorpay';
 
 interface CheckoutFormProps {
   total: number;
-  onOrderSuccess: (orderId: string) => void;
+  onOrderSuccess: (orderId: string, phone: string) => void;
   isProcessing: boolean;
   setIsProcessing: (processing: boolean) => void;
 }
@@ -152,7 +152,7 @@ export default function CheckoutForm({
             handler: (response) => {
               // Payment successful
               console.log('Payment successful:', response);
-              onOrderSuccess(orderId);
+              onOrderSuccess(orderId, formData.phone);
             },
             prefill: {
               name: `${formData.firstName} ${formData.lastName}`,
@@ -169,8 +169,8 @@ export default function CheckoutForm({
           setIsProcessing(false);
         }
       } else {
-        // COD - direct order success
-        onOrderSuccess(orderId);
+        // COD - redirect to OTP verification
+        onOrderSuccess(orderId, formData.phone);
       }
     } catch (error) {
       console.error('Order processing error:', error);
