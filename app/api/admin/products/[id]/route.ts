@@ -55,7 +55,22 @@ export async function PATCH(
       );
     }
 
-    // Update product - ensure images are preserved
+    // Clean up images - filter out placeholder paths
+    const cleanImages = (images: string[]): string[] => {
+      return images.filter((img: string) => 
+        img && (
+          img.startsWith('data:') || 
+          img.startsWith('http://') || 
+          img.startsWith('https://')
+        ) && !img.includes('placeholder-product.jpg')
+      );
+    };
+
+    // Update product - ensure images are preserved and cleaned
+    const bodyImages = body.images && Array.isArray(body.images) && body.images.length > 0 
+      ? cleanImages(body.images)
+      : cleanImages(product.images || []);
+    
     const updatedProduct: Product = {
       ...product,
       ...body,
@@ -63,10 +78,8 @@ export async function PATCH(
       price: body.price !== undefined ? Number(body.price) : product.price,
       compareAtPrice: body.compareAtPrice !== undefined ? Number(body.compareAtPrice) : product.compareAtPrice,
       inStock: body.sizes?.some((s: any) => s.available && s.stock > 0) ?? product.inStock,
-      // Ensure images array is preserved
-      images: body.images && Array.isArray(body.images) && body.images.length > 0 
-        ? body.images 
-        : product.images || [],
+      // Ensure images array is cleaned of placeholder paths
+      images: bodyImages.length > 0 ? bodyImages : product.images || [],
     };
 
     // Use saveProduct to ensure proper storage
