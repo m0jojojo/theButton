@@ -1,60 +1,28 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { getAllProducts } from '@/lib/products';
 
-// Mock data - will be replaced with Shopify API in Phase 3+
-const collections: Record<string, { name: string; description: string; products: any[] }> = {
+const collectionInfo: Record<string, { name: string; description: string }> = {
   'new-arrivals': {
     name: 'New Arrivals',
     description: 'Latest additions to our collection',
-    products: [
-      { id: '1', name: 'Classic White Shirt', price: 1999, image: '/placeholder-product.jpg' },
-      { id: '2', name: 'Navy Blue T-Shirt', price: 899, image: '/placeholder-product.jpg' },
-      { id: '3', name: 'Slim Fit Chinos', price: 2499, image: '/placeholder-product.jpg' },
-      { id: '4', name: 'Denim Jacket', price: 3499, image: '/placeholder-product.jpg' },
-      { id: '5', name: 'Cotton Polo', price: 1299, image: '/placeholder-product.jpg' },
-      { id: '6', name: 'Cargo Pants', price: 2199, image: '/placeholder-product.jpg' },
-    ],
   },
   'shirts': {
     name: 'Shirts',
     description: 'Premium quality shirts for every occasion',
-    products: [
-      { id: '7', name: 'Formal White Shirt', price: 1999, image: '/placeholder-product.jpg' },
-      { id: '8', name: 'Casual Check Shirt', price: 1799, image: '/placeholder-product.jpg' },
-      { id: '9', name: 'Linen Shirt', price: 2299, image: '/placeholder-product.jpg' },
-      { id: '10', name: 'Oxford Shirt', price: 1899, image: '/placeholder-product.jpg' },
-    ],
   },
   't-shirts': {
     name: 'T-Shirts',
     description: 'Comfortable and stylish t-shirts',
-    products: [
-      { id: '11', name: 'Basic White T-Shirt', price: 599, image: '/placeholder-product.jpg' },
-      { id: '12', name: 'Graphic Print T-Shirt', price: 899, image: '/placeholder-product.jpg' },
-      { id: '13', name: 'V-Neck T-Shirt', price: 699, image: '/placeholder-product.jpg' },
-      { id: '14', name: 'Polo T-Shirt', price: 1299, image: '/placeholder-product.jpg' },
-    ],
   },
   'pants': {
     name: 'Pants',
     description: 'Perfect fit pants for all occasions',
-    products: [
-      { id: '15', name: 'Slim Fit Chinos', price: 2499, image: '/placeholder-product.jpg' },
-      { id: '16', name: 'Cargo Pants', price: 2199, image: '/placeholder-product.jpg' },
-      { id: '17', name: 'Formal Trousers', price: 2799, image: '/placeholder-product.jpg' },
-      { id: '18', name: 'Joggers', price: 1899, image: '/placeholder-product.jpg' },
-    ],
   },
   'accessories': {
     name: 'Accessories',
     description: 'Complete your look with our accessories',
-    products: [
-      { id: '19', name: 'Leather Belt', price: 1299, image: '/placeholder-product.jpg' },
-      { id: '20', name: 'Wallet', price: 999, image: '/placeholder-product.jpg' },
-      { id: '21', name: 'Sunglasses', price: 1999, image: '/placeholder-product.jpg' },
-      { id: '22', name: 'Watch', price: 4999, image: '/placeholder-product.jpg' },
-    ],
   },
 };
 
@@ -69,11 +37,17 @@ export default function CollectionPage({
 }: {
   params: { slug: string };
 }) {
-  const collection = collections[params.slug];
+  const collectionData = collectionInfo[params.slug];
 
-  if (!collection) {
+  if (!collectionData) {
     notFound();
   }
+
+  // Get all products and filter by collection
+  const allProducts = getAllProducts();
+  const products = allProducts.filter(
+    (product) => product.collection.toLowerCase() === collectionData.name.toLowerCase()
+  );
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -88,47 +62,67 @@ export default function CollectionPage({
       {/* Collection Header */}
       <div className="mb-8 md:mb-12">
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-          {collection.name}
+          {collectionData.name}
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl">
-          {collection.description}
+          {collectionData.description}
         </p>
       </div>
 
       {/* Products Grid */}
-      {collection.products.length > 0 ? (
+      {products.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {collection.products.map((product) => (
-            <Link
-              key={product.id}
-              href={`/products/${product.id}`}
-              className="group"
-              aria-label={`View ${product.name} - ${formatPrice(product.price)}`}
-            >
-              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-3">
-                {product.image && product.image.startsWith('http') ? (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    quality={80}
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-colors flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Product Image</span>
-                  </div>
-                )}
-              </div>
-              <h3 className="font-semibold text-sm md:text-base mb-1 line-clamp-2 group-hover:text-gray-600 transition-colors">
-                {product.name}
-              </h3>
-              <p className="text-base md:text-lg font-bold">
-                {formatPrice(product.price)}
-              </p>
-            </Link>
-          ))}
+          {products.map((product) => {
+            // Get first image from product.images array
+            const productImage = product.images && product.images.length > 0 ? product.images[0] : null;
+            
+            return (
+              <Link
+                key={product.id}
+                href={`/products/${product.id}`}
+                className="group"
+                aria-label={`View ${product.name} - ${formatPrice(product.price)}`}
+              >
+                <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-3">
+                  {productImage ? (
+                    productImage.startsWith('data:') ? (
+                      // Base64 data URL - use regular img tag
+                      <img
+                        src={productImage}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : productImage.startsWith('http') ? (
+                      // HTTP/HTTPS URL - use Next.js Image
+                      <Image
+                        src={productImage}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        quality={80}
+                      />
+                    ) : (
+                      // Placeholder for invalid images
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-colors flex items-center justify-center">
+                        <span className="text-gray-500 text-sm">Product Image</span>
+                      </div>
+                    )
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-colors flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">Product Image</span>
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-semibold text-sm md:text-base mb-1 line-clamp-2 group-hover:text-gray-600 transition-colors">
+                  {product.name}
+                </h3>
+                <p className="text-base md:text-lg font-bold">
+                  {formatPrice(product.price)}
+                </p>
+              </Link>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-12">
