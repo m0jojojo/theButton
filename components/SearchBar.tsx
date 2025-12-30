@@ -188,35 +188,43 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
               >
                 {/* Product Image */}
                 <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-gray-100">
-                  {product.images && product.images.length > 0 && product.images[0] ? (
-                    product.images[0].startsWith('data:') ? (
-                      // Base64 data URL - use regular img tag
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.error('Image load error in SearchBar:', product.images[0]);
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : product.images[0].startsWith('http') ? (
-                      // HTTP/HTTPS URL - use Next.js Image
-                      <Image
-                        src={product.images[0]}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                        sizes="48px"
-                        quality={70}
-                      />
-                    ) : (
-                      // Placeholder for invalid images
-                      <PlaceholderImage alt={product.name} />
-                    )
-                  ) : (
-                    <PlaceholderImage alt={product.name} />
-                  )}
+                  {(() => {
+                    // Find first valid image (base64 or http/https URL)
+                    const validImage = product.images?.find((img: string) => 
+                      img && (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://'))
+                    );
+                    
+                    if (validImage) {
+                      if (validImage.startsWith('data:')) {
+                        // Base64 data URL - use regular img tag
+                        return (
+                          <img
+                            src={validImage}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Image load error in SearchBar:', validImage.substring(0, 50));
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        );
+                      } else {
+                        // HTTP/HTTPS URL - use Next.js Image
+                        return (
+                          <Image
+                            src={validImage}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                            sizes="48px"
+                            quality={70}
+                          />
+                        );
+                      }
+                    }
+                    // No valid image found - show placeholder
+                    return <PlaceholderImage alt={product.name} />;
+                  })()}
                 </div>
                 {/* Product Info */}
                 <div className="flex-1 min-w-0">
