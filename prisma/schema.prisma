@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  customer
+  admin
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  processing
+  shipped
+  delivered
+  cancelled
+}
+
+enum PaymentMethod {
+  razorpay
+  cod
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+}
+
+enum ReviewStatus {
+  approved
+  pending
+  rejected
+}
+
+// ============================================
+// USER MODEL
+// ============================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?
+  name         String
+  passwordHash String   @map("password_hash")
+  role         UserRole @default(customer)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  orders       Order[]
+  reviews      Review[]
+  reviewVotes  ReviewVote[]
+  whatsappEvents WhatsAppEvent[]
+
+  @@index([email])
+  @@index([phone])
+  @@map("users")
+}
+
+// ============================================
+// PRODUCT MODEL
+// ============================================
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  price          Decimal  @db.Decimal(10, 2)
+  compareAtPrice Decimal? @map("compare_at_price") @db.Decimal(10, 2)
+  description    String   @db.Text
+  images         Json     // Array of image URLs (base64 or http/https)
+  sizes          Json     // Array of { value: string, available: boolean, stock: number }
+  inStock        Boolean  @default(true) @map("in_stock")
+  sku            String   @unique
+  collection     String
+  searchKeywords Json?   @map("search_keywords") // Array of strings
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  orderItems     OrderItem[]
+  reviews        Review[]
+
+  @@index([collection])
+  @@index([sku])
+  @@index([inStock])
+  @@map("products")
+}
+
+// ============================================
+// ORDER MODELS
+// ============================================
+
+model Order {
+  id              String        @id @default(cuid())
+  orderId        String        @unique @map("order_id") // Display ID (e.g., ORD-1234567890-ABC)
+  userId         String?       @map("user_id") // Nullable for guest orders
+  userEmail      String        @map("user_email") // For matching (stable across restarts)
+  status         OrderStatus   @default(pending)
+  paymentMethod  PaymentMethod @map("payment_method")
+  paymentStatus  PaymentStatus @default(pending) @map("payment_status")
+  subtotal       Decimal       @db.Decimal(10, 2)
+  shipping       Decimal       @db.Decimal(10, 2)
+  total          Decimal       @db.Decimal(10, 2)
+  shippingAddress Json         @map("shipping_address") // JSON object with address fields
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+  whatsappEvents WhatsAppEvent[]
+
+  @@index([userId])
+  @@index([userEmail])
+  @@index([orderId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId       String   @map("order_id")
+  productId     String   @map("product_id")
+  name          String
+  price         Decimal  @db.Decimal(10, 2)
+  compareAtPrice Decimal? @map("compare_at_price") @db.Decimal(10, 2)
+  size          String
+  quantity      Int
+  image         String   @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+// ============================================
+// REVIEW MODELS
+// ============================================
+
+model Review {
+  id              String       @id @default(cuid())
+  productId       String       @map("product_id")
+  userId          String       @map("user_id")
+  userEmail       String       @map("user_email")
+  userName        String       @map("user_name")
+  rating          Int          // 1-5
+  comment         String       @db.Text
+  verifiedPurchase Boolean     @default(false) @map("verified_purchase")
+  helpfulCount    Int          @default(0) @map("helpful_count")
+  status          ReviewStatus @default(approved)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  product         Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes           ReviewVote[]
+
+  @@unique([productId, userEmail]) // One review per product per user
+  @@index([productId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+model ReviewVote {
+  id        String   @id @default(cuid())
+  reviewId String   @map("review_id")
+  userId    String   @map("user_id")
+  userEmail String   @map("user_email")
+  helpful   Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userEmail]) // One vote per review per user
+  @@index([reviewId])
+  @@index([userId])
+  @@map("review_votes")
+}
+
+// ============================================
+// WHATSAPP EVENT MODEL
+// ============================================
+
+model WhatsAppEvent {
+  id          String   @id @default(cuid())
+  userId      String?  @map("user_id") // Nullable for anonymous users
+  userEmail   String?  @map("user_email")
+  productId   String?  @map("product_id")
+  productName String?  @map("product_name")
+  page        String?  // Page where click occurred
+  orderId     String?  @map("order_id") // If related to an order
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userEmail])
+  @@index([productId])
+  @@index([orderId])
+  @@index([createdAt])
+  @@map("whatsapp_events")
+}
