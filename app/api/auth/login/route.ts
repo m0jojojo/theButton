@@ -15,23 +15,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log(`[Login API] Attempting login for: ${email}`);
+
     // Get user
     const user = await getUserByEmail(email);
     if (!user) {
+      console.log(`[Login API] User not found: ${email}`);
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
 
+    console.log(`[Login API] User found: ${user.email}, role: ${user.role}`);
+
     // Verify password
     const isValid = await verifyPassword(user, password);
     if (!isValid) {
+      console.log(`[Login API] Password verification failed for: ${email}`);
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
+
+    console.log(`[Login API] Login successful for: ${email}, role: ${user.role}`);
 
     // Generate token
     const token = signToken({
