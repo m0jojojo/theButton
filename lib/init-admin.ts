@@ -31,7 +31,7 @@ export async function initializeDefaultAdmin() {
     }
 
     // Check if any admin users exist
-    const allUsers = getAllUsers();
+    const allUsers = await getAllUsers();
     const hasAdmin = allUsers.some((user) => user.role === 'admin');
 
     if (hasAdmin) {

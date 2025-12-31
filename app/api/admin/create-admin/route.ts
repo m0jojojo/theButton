@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Check if any admin users exist
-    const allUsers = getAllUsers();
+    const allUsers = await getAllUsers();
     const hasAdmin = allUsers.some((user) => user.role === 'admin');
 
     if (hasAdmin) {

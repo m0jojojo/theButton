@@ -1,5 +1,5 @@
-// Mock user store - Replace with database in production
-// This is a temporary solution for MVP
+// User store - Uses database when DATABASE_URL is set, otherwise uses in-memory store
+// This provides backward compatibility while migrating to database
 
 import bcrypt from 'bcryptjs';
 
@@ -15,6 +15,9 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Check if database is available
+const USE_DATABASE = !!process.env.DATABASE_URL;
 
 // In-memory user store (replace with database)
 // Use global to persist across hot reloads
@@ -37,7 +40,11 @@ if (!global.__users_store) {
 }
 
 // Export function to get all users (for admin)
-export function getAllUsers(): User[] {
+export async function getAllUsers(): Promise<User[]> {
+  if (USE_DATABASE) {
+    const { getAllUsersFromDB } = await import('./users-db');
+    return getAllUsersFromDB();
+  }
   return Array.from(users.values());
 }
 
@@ -48,6 +55,12 @@ export async function createUser(data: {
   password: string;
   role?: UserRole;
 }): Promise<User> {
+  if (USE_DATABASE) {
+    const { createUserInDB } = await import('./users-db');
+    return createUserInDB(data);
+  }
+
+  // In-memory store (fallback)
   // Check if user already exists
   if (usersByEmail.has(data.email.toLowerCase())) {
     throw new Error('User with this email already exists');
@@ -76,18 +89,33 @@ export async function createUser(data: {
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
+  if (USE_DATABASE) {
+    const { getUserByEmailFromDB } = await import('./users-db');
+    return getUserByEmailFromDB(email);
+  }
   return usersByEmail.get(email.toLowerCase()) || null;
 }
 
 export async function getUserById(id: string): Promise<User | null> {
+  if (USE_DATABASE) {
+    const { getUserByIdFromDB } = await import('./users-db');
+    return getUserByIdFromDB(id);
+  }
   return users.get(id) || null;
 }
 
 export async function verifyPassword(user: User, password: string): Promise<boolean> {
+  // Password verification is the same regardless of storage
   return bcrypt.compare(password, user.passwordHash);
 }
 
 export async function updateUser(id: string, data: Partial<Omit<User, 'id' | 'passwordHash' | 'createdAt'>>): Promise<User | null> {
+  if (USE_DATABASE) {
+    const { updateUserInDB } = await import('./users-db');
+    return updateUserInDB(id, data);
+  }
+
+  // In-memory store (fallback)
   const user = users.get(id);
   if (!user) {
     return null;

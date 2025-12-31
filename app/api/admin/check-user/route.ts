@@ -7,7 +7,7 @@ export async function GET() {
     
     // Check if admin user exists
     const adminUser = await getUserByEmail(adminEmail);
-    const allUsers = getAllUsers();
+    const allUsers = await getAllUsers();
     
     return NextResponse.json({
       adminEmail,

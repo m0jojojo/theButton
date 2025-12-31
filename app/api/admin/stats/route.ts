@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const pendingOrders = allOrders.filter((order) => order.status === 'pending').length;
 
     // Get all users
-    const allUsers = getAllUsers();
+    const allUsers = await getAllUsers();
     const totalUsers = allUsers.length;
 
     // Get recent orders (last 10)

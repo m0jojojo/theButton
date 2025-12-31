@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const token = getTokenFromRequest(request);
     requireAdmin(token);
 
-    const allUsers = getAllUsers();
+    const allUsers = await getAllUsers();
 
     return NextResponse.json({
       users: allUsers.map(getUserPublic),
