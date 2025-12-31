@@ -91,7 +91,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <p className="text-sm text-gray-600">
               Don&apos;t have an account?{' '}
               <Link
@@ -101,6 +101,14 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
+            <div className="border-t border-gray-200 pt-3">
+              <Link
+                href="/admin/login"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Login as Admin
+              </Link>
+            </div>
           </div>
         </div>
       </div>

@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,40 +19,30 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // Use AuthContext login to update state properly
+      await login(email, password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Login failed');
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if user is admin
-      if (data.user.role !== 'admin') {
-        setError('Access denied. Admin privileges required.');
-        setIsLoading(false);
-        return;
-      }
-
-      // Store token and user
+      // Check if user is admin from localStorage (login function already stored it)
       if (typeof window !== 'undefined') {
-        localStorage.setItem('theButton_token', data.token);
-        localStorage.setItem('theButton_user', JSON.stringify(data.user));
+        const savedUser = localStorage.getItem('theButton_user');
+        if (savedUser) {
+          const user = JSON.parse(savedUser);
+          if (user.role !== 'admin') {
+            setError('Access denied. Admin privileges required.');
+            setIsLoading(false);
+            // Logout the non-admin user
+            localStorage.removeItem('theButton_token');
+            localStorage.removeItem('theButton_user');
+            return;
+          }
+        }
       }
 
-      // Redirect to admin dashboard
-      router.push('/admin/dashboard');
-    } catch (err) {
+      // Redirect to admin dashboard using replace to avoid back button issues
+      router.replace('/admin/dashboard');
+    } catch (err: any) {
       console.error('Login error:', err);
-      setError('An error occurred. Please try again.');
+      setError(err.message || 'An error occurred. Please try again.');
       setIsLoading(false);
     }
   };
