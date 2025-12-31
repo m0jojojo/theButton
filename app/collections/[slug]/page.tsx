@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getAllProducts } from '@/lib/products';
+import { getProductsByCollectionFromDB } from '@/lib/products-db';
 
 const collectionInfo: Record<string, { name: string; description: string }> = {
   'new-arrivals': {
@@ -32,7 +32,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function CollectionPage({
+export default async function CollectionPage({
   params,
 }: {
   params: { slug: string };
@@ -43,11 +43,8 @@ export default function CollectionPage({
     notFound();
   }
 
-  // Get all products and filter by collection
-  const allProducts = getAllProducts();
-  const products = allProducts.filter(
-    (product) => product.collection.toLowerCase() === collectionData.name.toLowerCase()
-  );
+  // Phase 4: Get products from database by collection
+  const products = await getProductsByCollectionFromDB(collectionData.name);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {

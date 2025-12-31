@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Product, searchProducts } from '@/lib/products';
+import { Product } from '@/lib/products';
 import Link from 'next/link';
 import Image from 'next/image';
 import PlaceholderImage from './PlaceholderImage';
@@ -31,18 +31,28 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
     }
 
     const timer = setTimeout(() => {
-      const results = searchProducts(query, undefined).slice(0, 5); // Top 5 suggestions
-      // Debug: Log first result's image data
-      if (results.length > 0) {
-        console.log('[SearchBar] First result:', {
-          name: results[0].name,
-          hasImages: !!results[0].images,
-          imageCount: results[0].images?.length || 0,
-          firstImage: results[0].images?.[0]?.substring(0, 50) || 'none',
+      // Phase 4: Search from database via API
+      fetch(`/api/products/search?q=${encodeURIComponent(query)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const results = (data.products || []).slice(0, 5); // Top 5 suggestions
+          // Debug: Log first result's image data
+          if (results.length > 0) {
+            console.log('[SearchBar] First result:', {
+              name: results[0].name,
+              hasImages: !!results[0].images,
+              imageCount: results[0].images?.length || 0,
+              firstImage: results[0].images?.[0]?.substring(0, 50) || 'none',
+            });
+          }
+          setSuggestions(results);
+          setIsOpen(results.length > 0);
+        })
+        .catch((error) => {
+          console.error('[SearchBar] Search error:', error);
+          setSuggestions([]);
+          setIsOpen(false);
         });
-      }
-      setSuggestions(results);
-      setIsOpen(results.length > 0);
     }, 200);
 
     return () => clearTimeout(timer);

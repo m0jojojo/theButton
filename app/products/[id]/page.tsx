@@ -5,20 +5,23 @@ import StickyAddToCart from '@/components/StickyAddToCart';
 import StickyWhatsApp from '@/components/StickyWhatsApp';
 import ProductViewTracker from '@/components/ProductViewTracker';
 import ProductReviews from '@/components/ProductReviews';
-import { products, getProductById } from '@/lib/products';
+import { getProductByIdFromDB, getAllProductIdsFromDB } from '@/lib/products-db';
 
 export async function generateStaticParams() {
-  return Object.keys(products).map((id) => ({
+  // Phase 4: Get product IDs from database
+  const productIds = await getAllProductIdsFromDB();
+  return productIds.map((id) => ({
     id,
   }));
 }
 
-export default function ProductPage({
+export default async function ProductPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const product = getProductById(params.id);
+  // Phase 4: Fetch product from database
+  const product = await getProductByIdFromDB(params.id);
 
   if (!product) {
     notFound();

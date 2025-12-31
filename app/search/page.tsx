@@ -4,8 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Product, getAllProducts, getCollections } from '@/lib/products';
-import { performSearch, sortProducts, SortOption } from '@/lib/search';
+import { Product } from '@/lib/products';
+import { sortProducts, SortOption } from '@/lib/search';
 import PlaceholderImage from '@/components/PlaceholderImage';
 import SearchBar from '@/components/SearchBar';
 
@@ -25,12 +25,36 @@ function SearchResultsContent() {
     inStock: searchParams.get('inStock') === 'true' ? true : undefined,
   });
 
-  const collections = getCollections();
+  // Phase 4: Fetch collections from API
+  const [collections, setCollections] = useState<string[]>([]);
 
   useEffect(() => {
-    const searchResult = performSearch(query, filters);
-    const sorted = sortProducts(searchResult.products, sortBy);
-    setResults(sorted);
+    // Fetch collections
+    fetch('/api/products/collections')
+      .then((res) => res.json())
+      .then((data) => setCollections(data.collections || []))
+      .catch(() => setCollections([]));
+  }, []);
+
+  useEffect(() => {
+    // Phase 4: Search products from database via API
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (filters.collection) params.set('collection', filters.collection);
+    if (filters.minPrice) params.set('minPrice', filters.minPrice.toString());
+    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice.toString());
+    if (filters.inStock) params.set('inStock', 'true');
+
+    fetch(`/api/products/search?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const sorted = sortProducts(data.products || [], sortBy);
+        setResults(sorted);
+      })
+      .catch((error) => {
+        console.error('Search error:', error);
+        setResults([]);
+      });
   }, [query, filters, sortBy]);
 
   const handleFilterChange = (key: string, value: string | number | boolean | undefined) => {

@@ -421,6 +421,7 @@ if (typeof global.__products_store !== 'undefined') {
 export { products };
 
 // Get all products as array
+// Phase 4: Keep sync version for backward compatibility (client-side)
 export function getAllProducts(): Product[] {
   // Always read from the global store to get latest updates
   const currentProducts = global.__products_store || products;
@@ -428,6 +429,7 @@ export function getAllProducts(): Product[] {
 }
 
 // Get product by ID
+// Phase 4: Keep sync version for backward compatibility (client-side)
 export function getProductById(id: string): Product | undefined {
   // Always read from the global store to get latest updates
   const currentProducts = global.__products_store || products;
