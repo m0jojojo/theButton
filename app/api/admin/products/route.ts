@@ -2,13 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromRequest } from '@/lib/jwt';
 import { requireAdmin } from '@/lib/admin';
 import { getAllProducts, saveProduct, Product } from '@/lib/products';
+import { getAllProductsFromDB, createProductInDB } from '@/lib/products-db';
 
 export async function GET(request: NextRequest) {
   try {
     const token = getTokenFromRequest(request);
     requireAdmin(token);
 
-    const allProducts = getAllProducts();
+    // Use database if DATABASE_URL is set, otherwise use in-memory store
+    const allProducts = process.env.DATABASE_URL
+      ? await getAllProductsFromDB()
+      : getAllProducts();
+
     return NextResponse.json({ products: allProducts });
   } catch (error: any) {
     console.error('Get products error:', error);
@@ -64,16 +69,26 @@ export async function POST(request: NextRequest) {
       searchKeywords: searchKeywords || [],
     };
 
-    // Use saveProduct to ensure proper storage
-    saveProduct(product);
+    // Use database if DATABASE_URL is set, otherwise use in-memory store
+    let createdProduct: Product;
+    if (process.env.DATABASE_URL) {
+      createdProduct = await createProductInDB(product);
+      console.log('[POST /api/admin/products] Created product in database:', {
+        id: createdProduct.id,
+        name: createdProduct.name,
+        imageCount: createdProduct.images?.length || 0,
+      });
+    } else {
+      saveProduct(product);
+      createdProduct = product;
+      console.log('[POST /api/admin/products] Created product in memory:', {
+        id: product.id,
+        name: product.name,
+        imageCount: product.images?.length || 0,
+      });
+    }
 
-    console.log('[POST /api/admin/products] Created product:', {
-      id: product.id,
-      name: product.name,
-      imageCount: product.images?.length || 0,
-    });
-
-    return NextResponse.json({ product }, { status: 201 });
+    return NextResponse.json({ product: createdProduct }, { status: 201 });
   } catch (error: any) {
     console.error('Create product error:', error);
     return NextResponse.json(

@@ -1,5 +1,8 @@
-// Mock order store - Replace with database in production
-// This is a temporary solution for MVP
+// Order store - Uses database when DATABASE_URL is set, otherwise uses in-memory store
+// This provides backward compatibility while migrating to database
+
+// Check if database is available
+const USE_DATABASE = !!process.env.DATABASE_URL;
 
 export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
@@ -64,7 +67,11 @@ if (!global.__orders_store) {
 }
 
 // Export function to get all orders (for admin)
-export function getAllOrders(): Order[] {
+export async function getAllOrders(): Promise<Order[]> {
+  if (USE_DATABASE) {
+    const { getAllOrdersFromDB } = await import('./orders-db');
+    return getAllOrdersFromDB();
+  }
   return Array.from(orders.values());
 }
 
@@ -121,10 +128,18 @@ export async function createOrder(data: {
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {
+  if (USE_DATABASE) {
+    const { getOrderByIdFromDB } = await import('./orders-db');
+    return getOrderByIdFromDB(id);
+  }
   return orders.get(id) || null;
 }
 
 export async function getOrderByOrderId(orderId: string): Promise<Order | null> {
+  if (USE_DATABASE) {
+    const { getOrderByOrderIdFromDB } = await import('./orders-db');
+    return getOrderByOrderIdFromDB(orderId);
+  }
   for (const order of orders.values()) {
     if (order.orderId === orderId) {
       return order;
@@ -134,6 +149,10 @@ export async function getOrderByOrderId(orderId: string): Promise<Order | null> 
 }
 
 export async function getOrdersByUserId(userId: string): Promise<Order[]> {
+  if (USE_DATABASE) {
+    const { getOrdersByUserIdFromDB } = await import('./orders-db');
+    return getOrdersByUserIdFromDB(userId);
+  }
   const userOrders = ordersByUserId.get(userId) || [];
   console.log(`Getting orders for user ID ${userId}: found ${userOrders.length} orders`);
   console.log(`Total orders in store: ${orders.size}, Total users with orders: ${ordersByUserId.size}`);
@@ -142,6 +161,10 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
 }
 
 export async function getOrdersByUserEmail(userEmail: string): Promise<Order[]> {
+  if (USE_DATABASE) {
+    const { getOrdersByUserEmailFromDB } = await import('./orders-db');
+    return getOrdersByUserEmailFromDB(userEmail);
+  }
   const normalizedEmail = userEmail.toLowerCase();
   console.log(`[getOrdersByUserEmail] Looking up orders for email: ${normalizedEmail}`);
   console.log(`[getOrdersByUserEmail] Total orders in store: ${orders.size}`);
@@ -157,6 +180,11 @@ export async function updateOrderStatus(
   id: string,
   status: OrderStatus
 ): Promise<Order | null> {
+  if (USE_DATABASE) {
+    const { updateOrderStatusInDB } = await import('./orders-db');
+    return updateOrderStatusInDB(id, status);
+  }
+
   const order = orders.get(id);
   if (!order) {
     return null;

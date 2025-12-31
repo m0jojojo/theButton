@@ -144,3 +144,74 @@ export async function getAllProductIdsFromDB(): Promise<string[]> {
   }
 }
 
+/**
+ * Create a new product in database
+ */
+export async function createProductInDB(product: Product): Promise<Product> {
+  try {
+    const createdProduct = await prisma.product.create({
+      data: {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        compareAtPrice: product.compareAtPrice,
+        description: product.description,
+        images: product.images || [],
+        sizes: product.sizes || [],
+        inStock: product.inStock,
+        sku: product.sku,
+        collection: product.collection,
+        searchKeywords: product.searchKeywords || [],
+      },
+    });
+
+    return prismaToProduct(createdProduct);
+  } catch (error) {
+    console.error('[products-db.ts] Error creating product:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update a product in database
+ */
+export async function updateProductInDB(id: string, product: Product): Promise<Product> {
+  try {
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: {
+        name: product.name,
+        price: product.price,
+        compareAtPrice: product.compareAtPrice,
+        description: product.description,
+        images: product.images || [],
+        sizes: product.sizes || [],
+        inStock: product.inStock,
+        sku: product.sku,
+        collection: product.collection,
+        searchKeywords: product.searchKeywords || [],
+      },
+    });
+
+    return prismaToProduct(updatedProduct);
+  } catch (error) {
+    console.error(`[products-db.ts] Error updating product ${id}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a product from database
+ */
+export async function deleteProductFromDB(id: string): Promise<boolean> {
+  try {
+    await prisma.product.delete({
+      where: { id },
+    });
+    return true;
+  } catch (error) {
+    console.error(`[products-db.ts] Error deleting product ${id}:`, error);
+    return false;
+  }
+}
+

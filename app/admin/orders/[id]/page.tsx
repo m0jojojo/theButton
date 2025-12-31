@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import AdminGuard from '@/components/AdminGuard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
@@ -246,8 +247,36 @@ export default function AdminOrderDetailPage() {
                 <div className="space-y-4">
                   {order.items.map((item, index) => (
                     <div key={index} className="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-0">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">Image</span>
+                      <div className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg bg-gray-100 overflow-hidden">
+                        {item.image ? (
+                          item.image.startsWith('data:') ? (
+                            // Base64 data URL - use regular img tag
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : item.image.startsWith('http') ? (
+                            // HTTP/HTTPS URL - use Next.js Image
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          ) : (
+                            // Placeholder for invalid images
+                            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                              <span className="text-gray-400 text-xs">Image</span>
+                            </div>
+                          )
+                        ) : (
+                          // No image - show placeholder
+                          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                            <span className="text-gray-400 text-xs">Image</span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{item.name}</h4>

@@ -182,15 +182,28 @@ function OrderDetailsContent({ orderId }: { orderId: string }) {
                       href={`/products/${item.productId}`}
                       className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg bg-gray-100 overflow-hidden hover:opacity-80 transition-opacity"
                     >
-                      {item.image && item.image.startsWith('http') ? (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                          sizes="96px"
-                          quality={75}
-                        />
+                      {item.image ? (
+                        item.image.startsWith('data:') ? (
+                          // Base64 data URL - use regular img tag
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : item.image.startsWith('http') ? (
+                          // HTTP/HTTPS URL - use Next.js Image
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="96px"
+                            quality={75}
+                          />
+                        ) : (
+                          // Invalid image - use placeholder
+                          <PlaceholderImage alt={item.name} />
+                        )
                       ) : (
                         <PlaceholderImage alt={item.name} />
                       )}

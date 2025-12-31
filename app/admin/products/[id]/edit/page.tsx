@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import AdminGuard from '@/components/AdminGuard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
+import ImageCropper from '@/components/ImageCropper';
 import { Product } from '@/lib/products';
 
 export default function EditProductPage() {
@@ -23,10 +24,55 @@ export default function EditProductPage() {
     sku: '',
     collection: '',
     images: '',
-    sizes: '',
   });
+  const [sizes, setSizes] = useState<Array<{ value: string; available: boolean; stock: number }>>([
+    { value: '', available: true, stock: 0 },
+  ]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [isProcessingUpload, setIsProcessingUpload] = useState(false);
+
+  const processFile = (file: File) => {
+    return new Promise<string>((resolve, reject) => {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        reject(new Error(`File "${file.name}" is too large. Maximum size is 10MB.`));
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        reject(new Error(`File "${file.name}" is not an image.`));
+        return;
+      }
+
+      const reader = new FileReader();
+      
+      reader.onloadend = () => {
+        if (reader.result && typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          reject(new Error(`Failed to read file "${file.name}"`));
+        }
+      };
+      
+      reader.onerror = () => {
+        reject(new Error(`Error reading file "${file.name}"`));
+      };
+      
+      reader.onabort = () => {
+        reject(new Error(`Reading file "${file.name}" was aborted`));
+      };
+
+      try {
+        reader.readAsDataURL(file);
+      } catch (err) {
+        reject(new Error(`Failed to process file "${file.name}": ${err}`));
+      }
+    });
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,8 +115,14 @@ export default function EditProductPage() {
           sku: data.product.sku,
           collection: data.product.collection,
           images: '', // Will be handled by imageUrls and uploadedImages
-          sizes: JSON.stringify(data.product.sizes, null, 2),
         });
+        
+        // Set sizes from product data
+        if (data.product.sizes && Array.isArray(data.product.sizes) && data.product.sizes.length > 0) {
+          setSizes(data.product.sizes);
+        } else {
+          setSizes([{ value: '', available: true, stock: 0 }]);
+        }
       } catch (err) {
         console.error('Error fetching product:', err);
         setError('Failed to load product');
@@ -82,20 +134,95 @@ export default function EditProductPage() {
     fetchProduct();
   }, [productId]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          setUploadedImages((prev) => [...prev, base64String]);
-        };
-        reader.readAsDataURL(file);
+    setIsProcessingUpload(true);
+    setError('');
+
+    try {
+      const fileArray = Array.from(files);
+      const validFiles: File[] = [];
+      
+      // Validate all files first
+      for (const file of fileArray) {
+        if (!file.type.startsWith('image/')) {
+          setError(`Skipping "${file.name}": Not an image file`);
+          continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          setError(`Skipping "${file.name}": File too large (max 10MB)`);
+          continue;
+        }
+        validFiles.push(file);
       }
-    });
+
+      if (validFiles.length === 0) {
+        setError('No valid image files selected');
+        setIsProcessingUpload(false);
+        return;
+      }
+
+      // Process first file and show cropper
+      const firstFile = validFiles[0];
+      const imageData = await processFile(firstFile);
+      setImageToCrop(imageData);
+      
+      // Store remaining files for processing after cropping
+      if (validFiles.length > 1) {
+        setPendingFiles(validFiles.slice(1));
+      }
+    } catch (err: any) {
+      console.error('Error processing image:', err);
+      setError(err.message || 'Failed to process image. Please try again.');
+    } finally {
+      setIsProcessingUpload(false);
+      // Reset input
+      if (e.target) {
+        e.target.value = '';
+      }
+    }
+  };
+
+  const handleCropComplete = (croppedImage: string) => {
+    setUploadedImages((prev) => [...prev, croppedImage]);
+    setImageToCrop(null);
+    
+    // Process next pending file if any
+    if (pendingFiles.length > 0) {
+      const nextFile = pendingFiles[0];
+      setPendingFiles((prev) => prev.slice(1));
+      processFile(nextFile)
+        .then((imageData) => {
+          setImageToCrop(imageData);
+        })
+        .catch((err) => {
+          console.error('Error processing next file:', err);
+          setError(err.message || 'Failed to process next image');
+          // Continue with remaining files
+          if (pendingFiles.length > 1) {
+            setPendingFiles((prev) => prev.slice(1));
+          }
+        });
+    }
+  };
+
+  const handleCropCancel = () => {
+    setImageToCrop(null);
+    // Continue with next file if any
+    if (pendingFiles.length > 0) {
+      const nextFile = pendingFiles[0];
+      setPendingFiles((prev) => prev.slice(1));
+      processFile(nextFile)
+        .then((imageData) => {
+          setImageToCrop(imageData);
+        })
+        .catch((err) => {
+          console.error('Error processing next file:', err);
+          setError(err.message || 'Failed to process next image');
+        });
+    }
   };
 
   const handleRemoveImage = (index: number, isUploaded: boolean) => {
@@ -114,18 +241,42 @@ export default function EditProductPage() {
     }
   };
 
+  const handleAddSize = () => {
+    setSizes([...sizes, { value: '', available: true, stock: 0 }]);
+  };
+
+  const handleRemoveSize = (index: number) => {
+    if (sizes.length > 1) {
+      setSizes(sizes.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleSizeChange = (index: number, field: 'value' | 'available' | 'stock', value: string | boolean | number) => {
+    const updatedSizes = [...sizes];
+    updatedSizes[index] = {
+      ...updatedSizes[index],
+      [field]: value,
+    };
+    setSizes(updatedSizes);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     setError('');
 
     try {
-      // Parse sizes JSON
-      let parsedSizes;
-      try {
-        parsedSizes = JSON.parse(formData.sizes);
-      } catch (err) {
-        throw new Error('Invalid sizes JSON format');
+      // Validate sizes
+      const validSizes = sizes.filter((size) => size.value.trim() !== '');
+      if (validSizes.length === 0) {
+        throw new Error('At least one size is required');
+      }
+
+      // Validate that all sizes have valid stock
+      for (const size of validSizes) {
+        if (size.stock < 0) {
+          throw new Error(`Stock cannot be negative for size ${size.value}`);
+        }
       }
 
       // Combine uploaded images (base64) and URL images
@@ -150,7 +301,7 @@ export default function EditProductPage() {
           sku: formData.sku,
           collection: formData.collection,
           images: allImages,
-          sizes: parsedSizes,
+          sizes: validSizes,
         }),
       });
 
@@ -358,22 +509,36 @@ export default function EditProductPage() {
                     <div className="mb-4">
                       <label
                         htmlFor="image-upload"
-                        className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                        className={`inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer ${
+                          isProcessingUpload ? 'opacity-60 cursor-not-allowed' : ''
+                        }`}
                       >
-                        <svg
-                          className="w-5 h-5 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Upload Images from Desktop
+                        {isProcessingUpload ? (
+                          <>
+                            <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              className="w-5 h-5 mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            Upload Images from Desktop
+                          </>
+                        )}
                       </label>
                       <input
                         id="image-upload"
@@ -381,10 +546,16 @@ export default function EditProductPage() {
                         accept="image/*"
                         multiple
                         onChange={handleImageUpload}
+                        disabled={isProcessingUpload}
                         className="hidden"
                       />
                       <p className="mt-2 text-sm text-gray-500">
-                        Select one or more images from your computer
+                        Select one or more images from your computer (max 10MB each)
+                        {pendingFiles.length > 0 && (
+                          <span className="ml-2 text-gray-700 font-medium">
+                            • {pendingFiles.length} more image{pendingFiles.length > 1 ? 's' : ''} waiting
+                          </span>
+                        )}
                       </p>
                     </div>
 
@@ -473,20 +644,95 @@ export default function EditProductPage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="sizes" className="block text-sm font-medium text-gray-700 mb-2">
-                      Sizes (JSON format) *
-                    </label>
-                    <textarea
-                      id="sizes"
-                      value={formData.sizes}
-                      onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
-                      required
-                      rows={6}
-                      placeholder='[{"value": "S", "available": true, "stock": 10}, {"value": "M", "available": true, "stock": 15}]'
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 font-mono text-sm"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      Format: Array of objects with value, available (boolean), and stock (number)
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Product Sizes *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddSize}
+                        className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Size
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {sizes.map((size, index) => (
+                        <div key={index} className="flex gap-3 items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Size Value
+                            </label>
+                            <select
+                              value={size.value}
+                              onChange={(e) => handleSizeChange(index, 'value', e.target.value)}
+                              required
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-sm"
+                            >
+                              <option value="">Select Size</option>
+                              <option value="XS">XS</option>
+                              <option value="S">S</option>
+                              <option value="M">M</option>
+                              <option value="L">L</option>
+                              <option value="XL">XL</option>
+                              <option value="XXL">XXL</option>
+                              <option value="28">28</option>
+                              <option value="30">30</option>
+                              <option value="32">32</option>
+                              <option value="34">34</option>
+                              <option value="36">36</option>
+                              <option value="38">38</option>
+                              <option value="40">40</option>
+                              <option value="One Size">One Size</option>
+                            </select>
+                          </div>
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Available
+                            </label>
+                            <select
+                              value={size.available ? 'true' : 'false'}
+                              onChange={(e) => handleSizeChange(index, 'available', e.target.value === 'true')}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-sm"
+                            >
+                              <option value="true">Available</option>
+                              <option value="false">Not Available</option>
+                            </select>
+                          </div>
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Stock
+                            </label>
+                            <input
+                              type="number"
+                              value={size.stock}
+                              onChange={(e) => handleSizeChange(index, 'stock', parseInt(e.target.value) || 0)}
+                              min="0"
+                              required
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-sm"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSize(index)}
+                            disabled={sizes.length === 1}
+                            className={`mt-6 p-2 text-red-600 hover:text-red-800 transition-colors ${
+                              sizes.length === 1 ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                            title="Remove size"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">
+                      Add at least one size with value, availability, and stock quantity
                     </p>
                   </div>
                 </div>
@@ -513,6 +759,17 @@ export default function EditProductPage() {
           ) : null}
         </main>
       </div>
+
+      {/* Image Cropper Modal */}
+      {imageToCrop && (
+        <ImageCropper
+          image={imageToCrop}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          aspect={1}
+          maxSize={2000}
+        />
+      )}
     </AdminGuard>
   );
 }

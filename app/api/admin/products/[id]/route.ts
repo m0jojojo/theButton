@@ -2,14 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromRequest } from '@/lib/jwt';
 import { requireAdmin } from '@/lib/admin';
 import { getProductById, saveProduct, deleteProduct, Product } from '@/lib/products';
-
-// Get reference to the global store
-declare global {
-  var __products_store: Record<string, Product> | undefined;
-}
-
-// Use the global store directly
-const products = global.__products_store || productsStore;
+import { getProductByIdFromDB, updateProductInDB, deleteProductFromDB } from '@/lib/products-db';
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +12,11 @@ export async function GET(
     const token = getTokenFromRequest(request);
     requireAdmin(token);
 
-    const product = getProductById(params.id);
+    // Use database if DATABASE_URL is set, otherwise use in-memory store
+    const product = process.env.DATABASE_URL
+      ? await getProductByIdFromDB(params.id)
+      : getProductById(params.id);
+
     if (!product) {
       return NextResponse.json(
         { error: 'Product not found' },
@@ -46,9 +43,13 @@ export async function PATCH(
     requireAdmin(token);
 
     const body = await request.json();
-    const product = getProductById(params.id);
+    
+    // Fetch existing product (use database if available)
+    const existingProduct = process.env.DATABASE_URL
+      ? await getProductByIdFromDB(params.id)
+      : getProductById(params.id);
 
-    if (!product) {
+    if (!existingProduct) {
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }
@@ -69,31 +70,39 @@ export async function PATCH(
     // Update product - ensure images are preserved and cleaned
     const bodyImages = body.images && Array.isArray(body.images) && body.images.length > 0 
       ? cleanImages(body.images)
-      : cleanImages(product.images || []);
+      : cleanImages(existingProduct.images || []);
     
     const updatedProduct: Product = {
-      ...product,
+      ...existingProduct,
       ...body,
       id: params.id, // Ensure ID doesn't change
-      price: body.price !== undefined ? Number(body.price) : product.price,
-      compareAtPrice: body.compareAtPrice !== undefined ? Number(body.compareAtPrice) : product.compareAtPrice,
-      inStock: body.sizes?.some((s: any) => s.available && s.stock > 0) ?? product.inStock,
+      price: body.price !== undefined ? Number(body.price) : existingProduct.price,
+      compareAtPrice: body.compareAtPrice !== undefined ? Number(body.compareAtPrice) : existingProduct.compareAtPrice,
+      inStock: body.sizes?.some((s: any) => s.available && s.stock > 0) ?? existingProduct.inStock,
       // Ensure images array is cleaned of placeholder paths
-      images: bodyImages.length > 0 ? bodyImages : product.images || [],
+      images: bodyImages.length > 0 ? bodyImages : existingProduct.images || [],
     };
 
-    // Use saveProduct to ensure proper storage
-    saveProduct(updatedProduct);
+    // Use database if DATABASE_URL is set, otherwise use in-memory store
+    let savedProduct: Product;
+    if (process.env.DATABASE_URL) {
+      savedProduct = await updateProductInDB(params.id, updatedProduct);
+      console.log('[PATCH /api/admin/products/[id]] Updated product in database:', {
+        id: savedProduct.id,
+        name: savedProduct.name,
+        imageCount: savedProduct.images?.length || 0,
+      });
+    } else {
+      saveProduct(updatedProduct);
+      savedProduct = updatedProduct;
+      console.log('[PATCH /api/admin/products/[id]] Updated product in memory:', {
+        id: updatedProduct.id,
+        name: updatedProduct.name,
+        imageCount: updatedProduct.images?.length || 0,
+      });
+    }
 
-    // Debug log
-    console.log('[PATCH /api/admin/products/[id]] Updated product:', {
-      id: updatedProduct.id,
-      name: updatedProduct.name,
-      imageCount: updatedProduct.images?.length || 0,
-      firstImagePreview: updatedProduct.images?.[0]?.substring(0, 50) || 'none',
-    });
-
-    return NextResponse.json({ product: updatedProduct });
+    return NextResponse.json({ product: savedProduct });
   } catch (error: any) {
     console.error('Update product error:', error);
     return NextResponse.json(
@@ -111,7 +120,11 @@ export async function DELETE(
     const token = getTokenFromRequest(request);
     requireAdmin(token);
 
-    const product = getProductById(params.id);
+    // Check if product exists (use database if available)
+    const product = process.env.DATABASE_URL
+      ? await getProductByIdFromDB(params.id)
+      : getProductById(params.id);
+
     if (!product) {
       return NextResponse.json(
         { error: 'Product not found' },
@@ -119,11 +132,20 @@ export async function DELETE(
       );
     }
 
-    // Delete from both the global store and local reference
-    if (global.__products_store) {
-      delete global.__products_store[params.id];
+    // Delete from database if DATABASE_URL is set, otherwise from in-memory store
+    if (process.env.DATABASE_URL) {
+      const deleted = await deleteProductFromDB(params.id);
+      if (!deleted) {
+        return NextResponse.json(
+          { error: 'Failed to delete product from database' },
+          { status: 500 }
+        );
+      }
+      console.log(`[DELETE /api/admin/products/[id]] Deleted product ${params.id} from database`);
+    } else {
+      deleteProduct(params.id);
+      console.log(`[DELETE /api/admin/products/[id]] Deleted product ${params.id} from memory`);
     }
-    delete products[params.id];
 
     return NextResponse.json({ message: 'Product deleted successfully' });
   } catch (error: any) {

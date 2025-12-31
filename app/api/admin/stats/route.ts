@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const totalProducts = products.length;
 
     // Get all orders
-    const allOrders = getAllOrders();
+    const allOrders = await getAllOrders();
     
     const totalOrders = allOrders.length;
     const totalRevenue = allOrders.reduce((sum, order) => sum + (order.total || 0), 0);
