@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
+import ProductReviewStars from './ProductReviewStars';
 
 interface UpsellProduct {
   id: string;
@@ -119,6 +120,9 @@ export default function CartUpsells() {
               <h4 className="font-medium text-sm mb-1 text-gray-900 group-hover:text-gray-600 transition-colors line-clamp-2">
                 {product.name}
               </h4>
+              <div className="mb-1">
+                <ProductReviewStars productId={product.id} size="sm" />
+              </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm font-bold text-gray-900">{formatPrice(product.price)}</p>
                 {product.compareAtPrice && product.compareAtPrice > product.price && (

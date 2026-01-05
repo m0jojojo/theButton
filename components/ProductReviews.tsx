@@ -119,7 +119,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   };
 
   return (
-    <div className="mt-12 border-t border-gray-200 pt-8">
+    <div id="product-reviews" className="mt-12 border-t border-gray-200 pt-8">
       <div className="flex items-start justify-between mb-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Customer Reviews</h2>

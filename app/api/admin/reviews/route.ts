@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const token = getTokenFromRequest(request);
     requireAdmin(token);
 
-    const reviews = getAllReviews();
+    const reviews = await getAllReviews();
     return NextResponse.json({ reviews });
   } catch (error: any) {
     console.error('Get reviews error:', error);
@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const review = updateReviewStatus(reviewId, status);
+    const review = await updateReviewStatus(reviewId, status);
     return NextResponse.json({ review });
   } catch (error: any) {
     console.error('Update review status error:', error);
@@ -70,7 +70,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    deleteReview(reviewId);
+    await deleteReview(reviewId);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Delete review error:', error);

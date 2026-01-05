@@ -128,6 +128,12 @@ export default function AdminProductsPage() {
               >
                 Users
               </Link>
+              <Link
+                href="/admin/reviews"
+                className="py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
+              >
+                Reviews
+              </Link>
             </div>
           </div>
         </nav>

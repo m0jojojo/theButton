@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import SearchBar from './SearchBar';
 
 const navLinks = [
+  { name: 'All Products', href: '/products' },
   { name: 'New Arrivals', href: '/collections/new-arrivals' },
   { name: 'Shirts', href: '/collections/shirts' },
   { name: 'T-Shirts', href: '/collections/t-shirts' },

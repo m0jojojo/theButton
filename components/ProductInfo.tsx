@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SizeSelector from './SizeSelector';
 import { motion } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
+import StarRating from './StarRating';
 
 interface ProductInfoProps {
   product: {
@@ -24,8 +25,38 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+  const [reviewStats, setReviewStats] = useState<{ averageRating: number; totalReviews: number } | null>(null);
   const { addItem } = useCart();
   const router = useRouter();
+
+  // Fetch review stats
+  useEffect(() => {
+    const fetchReviewStats = async () => {
+      try {
+        const response = await fetch(`/api/reviews?productId=${product.id}&includeStats=true`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.stats) {
+            setReviewStats({
+              averageRating: data.stats.averageRating || 0,
+              totalReviews: data.stats.totalReviews || 0,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching review stats:', error);
+      }
+    };
+
+    fetchReviewStats();
+  }, [product.id]);
+
+  const scrollToReviews = () => {
+    const reviewsSection = document.getElementById('product-reviews');
+    if (reviewsSection) {
+      reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -79,6 +110,24 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Product Title */}
       <h1 className="text-3xl md:text-4xl font-bold">{product.name}</h1>
+
+      {/* Review Stars */}
+      {reviewStats && reviewStats.totalReviews > 0 && (
+        <button
+          onClick={scrollToReviews}
+          className="flex items-center gap-2 group hover:opacity-80 transition-opacity"
+          aria-label={`${reviewStats.averageRating.toFixed(1)} out of 5 stars, ${reviewStats.totalReviews} reviews. Click to view reviews.`}
+        >
+          <StarRating
+            rating={reviewStats.averageRating}
+            size="md"
+            showValue={true}
+          />
+          <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+            ({reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'})
+          </span>
+        </button>
+      )}
 
       {/* Price & Discount */}
       <div className="flex items-baseline gap-3">

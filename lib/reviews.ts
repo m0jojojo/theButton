@@ -79,7 +79,20 @@ export async function createReview(data: {
     throw new Error('Rating must be between 1 and 5');
   }
 
-  // Check if user already reviewed this product
+  // Check if user purchased the product
+  const verifiedPurchase = await hasUserPurchasedProduct(data.userEmail, data.productId);
+
+  if (USE_DATABASE) {
+    const { createReviewInDB } = await import('./reviews-db');
+    return createReviewInDB({
+      ...data,
+      comment: data.comment.trim(),
+      verifiedPurchase,
+      status: 'approved', // Auto-approve for MVP
+    });
+  }
+
+  // Check if user already reviewed this product (in-memory)
   const existingReviews = reviewsByProduct.get(data.productId) || [];
   const existingReview = existingReviews.find(
     (r) => r.userEmail === data.userEmail || r.userId === data.userId
@@ -88,9 +101,6 @@ export async function createReview(data: {
   if (existingReview) {
     throw new Error('You have already reviewed this product');
   }
-
-  // Check if user purchased the product
-  const verifiedPurchase = await hasUserPurchasedProduct(data.userEmail, data.productId);
 
   const review: Review = {
     id: `review_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -126,10 +136,15 @@ export async function createReview(data: {
 }
 
 // Get reviews for a product
-export function getReviewsByProductId(productId: string, options?: {
+export async function getReviewsByProductId(productId: string, options?: {
   status?: 'approved' | 'pending' | 'rejected' | 'all';
   sortBy?: 'newest' | 'oldest' | 'rating' | 'helpful';
-}): Review[] {
+}): Promise<Review[]> {
+  if (USE_DATABASE) {
+    const { getReviewsByProductIdFromDB } = await import('./reviews-db');
+    return getReviewsByProductIdFromDB(productId, options);
+  }
+
   const productReviews = reviewsByProduct.get(productId) || [];
   
   // Filter by status
@@ -163,12 +178,12 @@ export function getReviewsByProductId(productId: string, options?: {
 }
 
 // Get review statistics for a product
-export function getReviewStats(productId: string): {
+export async function getReviewStats(productId: string): Promise<{
   averageRating: number;
   totalReviews: number;
   ratingDistribution: { [rating: number]: number };
-} {
-  const productReviews = getReviewsByProductId(productId, { status: 'approved' });
+}> {
+  const productReviews = await getReviewsByProductId(productId, { status: 'approved' });
   
   if (productReviews.length === 0) {
     return {
@@ -266,13 +281,29 @@ export function getUserVoteOnReview(reviewId: string, userEmail: string): Review
   return reviewVotes.get(voteKey) || null;
 }
 
+// Check if database is available
+const USE_DATABASE = !!process.env.DATABASE_URL;
+
 // Get all reviews (for admin)
-export function getAllReviews(): Review[] {
+export async function getAllReviews(): Promise<Review[]> {
+  if (USE_DATABASE) {
+    const { getAllReviewsFromDB } = await import('./reviews-db');
+    return getAllReviewsFromDB();
+  }
   return Array.from(reviews.values());
 }
 
 // Update review status (for moderation)
-export function updateReviewStatus(reviewId: string, status: 'approved' | 'pending' | 'rejected'): Review {
+export async function updateReviewStatus(reviewId: string, status: 'approved' | 'pending' | 'rejected'): Promise<Review> {
+  if (USE_DATABASE) {
+    const { updateReviewStatusInDB } = await import('./reviews-db');
+    const updated = await updateReviewStatusInDB(reviewId, status);
+    if (!updated) {
+      throw new Error('Review not found');
+    }
+    return updated;
+  }
+
   const review = reviews.get(reviewId);
   if (!review) {
     throw new Error('Review not found');
@@ -294,7 +325,16 @@ export function updateReviewStatus(reviewId: string, status: 'approved' | 'pendi
 }
 
 // Delete a review
-export function deleteReview(reviewId: string): void {
+export async function deleteReview(reviewId: string): Promise<void> {
+  if (USE_DATABASE) {
+    const { deleteReviewFromDB } = await import('./reviews-db');
+    const deleted = await deleteReviewFromDB(reviewId);
+    if (!deleted) {
+      throw new Error('Review not found');
+    }
+    return;
+  }
+
   const review = reviews.get(reviewId);
   if (!review) {
     throw new Error('Review not found');

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get reviews (only approved for public)
-    const reviews = getReviewsByProductId(productId, {
+    const reviews = await getReviewsByProductId(productId, {
       status: 'approved',
       sortBy: sortBy || 'newest',
     });
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     // Include stats if requested
     if (includeStats) {
-      const stats = getReviewStats(productId);
+      const stats = await getReviewStats(productId);
       response.stats = stats;
     }
 
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Get updated stats
-    const stats = getReviewStats(productId);
+    const stats = await getReviewStats(productId);
 
     return NextResponse.json(
       { review, stats },
