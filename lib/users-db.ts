@@ -109,7 +109,7 @@ export async function createUserInDB(data: {
  */
 export async function updateUserInDB(
   id: string,
-  data: Partial<Omit<User, 'id' | 'passwordHash' | 'createdAt'>>
+  data: Partial<Omit<User, 'id' | 'passwordHash' | 'createdAt'>> & { password?: string }
 ): Promise<User | null> {
   try {
     // If email is being updated, check if new email already exists
@@ -123,14 +123,22 @@ export async function updateUserInDB(
       }
     }
 
+    // Prepare update data
+    const updateData: any = {
+      ...(data.email && { email: data.email.toLowerCase() }),
+      ...(data.phone !== undefined && { phone: data.phone }),
+      ...(data.name && { name: data.name }),
+      ...(data.role && { role: data.role }),
+    };
+
+    // If password is provided, hash it
+    if (data.password && data.password.trim()) {
+      updateData.passwordHash = await bcrypt.hash(data.password, 10);
+    }
+
     const updated = await prisma.user.update({
       where: { id },
-      data: {
-        ...(data.email && { email: data.email.toLowerCase() }),
-        ...(data.phone !== undefined && { phone: data.phone }),
-        ...(data.name && { name: data.name }),
-        ...(data.role && { role: data.role }),
-      },
+      data: updateData,
     });
 
     return prismaToUser(updated);

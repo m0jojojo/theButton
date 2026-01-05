@@ -109,7 +109,10 @@ export async function verifyPassword(user: User, password: string): Promise<bool
   return bcrypt.compare(password, user.passwordHash);
 }
 
-export async function updateUser(id: string, data: Partial<Omit<User, 'id' | 'passwordHash' | 'createdAt'>>): Promise<User | null> {
+export async function updateUser(
+  id: string,
+  data: Partial<Omit<User, 'id' | 'passwordHash' | 'createdAt'>> & { password?: string }
+): Promise<User | null> {
   if (USE_DATABASE) {
     const { updateUserInDB } = await import('./users-db');
     return updateUserInDB(id, data);
@@ -121,19 +124,29 @@ export async function updateUser(id: string, data: Partial<Omit<User, 'id' | 'pa
     return null;
   }
 
+  // Handle password update for in-memory store
+  let passwordHash = user.passwordHash;
+  if (data.password && data.password.trim()) {
+    passwordHash = await bcrypt.hash(data.password, 10);
+  }
+
   const updated: User = {
     ...user,
     ...data,
+    passwordHash,
     updatedAt: new Date(),
   };
 
-  users.set(id, updated);
+  // Remove password from updated object before storing
+  const { password: _, ...userData } = updated;
+
+  users.set(id, userData);
   if (data.email && data.email !== user.email) {
     usersByEmail.delete(user.email);
-    usersByEmail.set(data.email.toLowerCase(), updated);
+    usersByEmail.set(data.email.toLowerCase(), userData);
   }
 
-  return updated;
+  return userData;
 }
 
 // Helper to get user without password hash
