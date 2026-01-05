@@ -20,9 +20,9 @@ const collectionInfo: Record<string, { name: string; description: string }> = {
     name: 'Pants',
     description: 'Perfect fit pants for all occasions',
   },
-  'accessories': {
-    name: 'Accessories',
-    description: 'Complete your look with our accessories',
+  'jackets': {
+    name: 'Jackets',
+    description: 'Stylish jackets for every season',
   },
 };
 

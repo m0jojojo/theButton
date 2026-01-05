@@ -362,8 +362,8 @@ const defaultProducts: Record<string, Product> = {
     ],
     inStock: true,
     sku: 'BELT-LEA-001',
-    collection: 'Accessories',
-    searchKeywords: ['belt', 'leather', 'accessory'],
+    collection: 'Jackets',
+    searchKeywords: ['belt', 'leather', 'jacket'],
   },
   '20': {
     id: '20',
@@ -375,8 +375,8 @@ const defaultProducts: Record<string, Product> = {
     sizes: [{ value: 'One Size', available: true, stock: 15 }],
     inStock: true,
     sku: 'WALLET-001',
-    collection: 'Accessories',
-    searchKeywords: ['wallet', 'leather', 'accessory'],
+    collection: 'Jackets',
+    searchKeywords: ['wallet', 'leather', 'jacket'],
   },
   '21': {
     id: '21',
@@ -388,8 +388,8 @@ const defaultProducts: Record<string, Product> = {
     sizes: [{ value: 'One Size', available: true, stock: 10 }],
     inStock: true,
     sku: 'SUNGLASSES-001',
-    collection: 'Accessories',
-    searchKeywords: ['sunglasses', 'accessory', 'uv', 'protection'],
+    collection: 'Jackets',
+    searchKeywords: ['sunglasses', 'jacket', 'uv', 'protection'],
   },
   '22': {
     id: '22',
@@ -401,8 +401,8 @@ const defaultProducts: Record<string, Product> = {
     sizes: [{ value: 'One Size', available: true, stock: 4 }],
     inStock: true,
     sku: 'WATCH-001',
-    collection: 'Accessories',
-    searchKeywords: ['watch', 'wristwatch', 'accessory', 'timepiece'],
+    collection: 'Jackets',
+    searchKeywords: ['watch', 'wristwatch', 'jacket', 'timepiece'],
   },
 };
 

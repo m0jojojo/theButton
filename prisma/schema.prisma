@@ -226,3 +226,17 @@ model WhatsAppEvent {
   @@index([createdAt])
   @@map("whatsapp_events")
 }
+
+// ============================================
+// HOMEPAGE SETTINGS MODEL
+// ============================================
+
+model HomepageSettings {
+  id                String   @id @default("homepage") // Singleton - only one record
+  heroBannerImage   String?  @map("hero_banner_image") @db.Text // Base64 or URL
+  collectionImages  Json     @map("collection_images") // { shirts: string, tShirts: string, pants: string, jackets: string }
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("homepage_settings")
+}

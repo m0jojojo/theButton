@@ -1,12 +1,31 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { getHomepageSettingsFromDB } from '@/lib/homepage-settings-db';
 
-export default function Home() {
+export default async function Home() {
+  const settings = await getHomepageSettingsFromDB();
+  
+  const heroBannerImage = settings?.heroBannerImage;
+  const collectionImages = settings?.collectionImages || {};
+
   return (
     <>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-        <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32">
+      <section 
+        className={`relative text-white ${heroBannerImage ? '' : 'bg-gradient-to-br from-gray-900 to-gray-800'}`}
+        style={heroBannerImage ? {
+          backgroundImage: heroBannerImage.startsWith('data:') 
+            ? `url(${heroBannerImage})` 
+            : `url(${heroBannerImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        } : {}}
+      >
+        {heroBannerImage && (
+          <div className="absolute inset-0 bg-black bg-opacity-40" />
+        )}
+        <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Premium Menswear
@@ -43,24 +62,48 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
-              { name: 'Shirts', href: '/collections/shirts', image: '/placeholder-shirt.jpg' },
-              { name: 'T-Shirts', href: '/collections/t-shirts', image: '/placeholder-tshirt.jpg' },
-              { name: 'Pants', href: '/collections/pants', image: '/placeholder-pants.jpg' },
-              { name: 'Accessories', href: '/collections/accessories', image: '/placeholder-accessories.jpg' },
-            ].map((category) => (
-              <Link
-                key={category.href}
-                href={category.href}
-                className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 hover:shadow-lg transition-shadow"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-60 group-hover:opacity-70 transition-opacity" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl md:text-2xl font-bold text-white z-10">
-                    {category.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
+              { name: 'Shirts', href: '/collections/shirts', key: 'shirts' },
+              { name: 'T-Shirts', href: '/collections/t-shirts', key: 'tShirts' },
+              { name: 'Pants', href: '/collections/pants', key: 'pants' },
+              { name: 'Jackets', href: '/collections/jackets', key: 'jackets' },
+            ].map((category) => {
+              const categoryImage = collectionImages[category.key as keyof typeof collectionImages];
+              return (
+                <Link
+                  key={category.href}
+                  href={category.href}
+                  className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 hover:shadow-lg transition-shadow"
+                >
+                  {categoryImage ? (
+                    <>
+                      {categoryImage.startsWith('data:') ? (
+                        <img
+                          src={categoryImage}
+                          alt={category.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Image
+                          src={categoryImage}
+                          alt={category.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-60 group-hover:opacity-50 transition-opacity" />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-60 group-hover:opacity-70 transition-opacity" />
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <h3 className="text-xl md:text-2xl font-bold text-white z-10">
+                      {category.name}
+                    </h3>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

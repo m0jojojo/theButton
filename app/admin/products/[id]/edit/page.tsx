@@ -482,7 +482,7 @@ export default function EditProductPage() {
                       <option value="Shirts">Shirts</option>
                       <option value="T-Shirts">T-Shirts</option>
                       <option value="Pants">Pants</option>
-                      <option value="Accessories">Accessories</option>
+                      <option value="Jackets">Jackets</option>
                     </select>
                   </div>
 

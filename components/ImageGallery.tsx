@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
@@ -21,6 +21,18 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
   const handleImageClick = () => {
     setIsZoomed(!isZoomed);
   };
+
+  // Prevent body scroll when zoomed
+  useEffect(() => {
+    if (isZoomed) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isZoomed]);
 
   return (
     <div className="space-y-4">
@@ -127,14 +139,14 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4"
             onClick={() => setIsZoomed(false)}
           >
             <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              className="relative max-w-4xl w-full aspect-square"
+              className="relative max-w-4xl w-full aspect-square z-[10000]"
               onClick={(e) => e.stopPropagation()}
             >
               {validImages[selectedImage] ? (

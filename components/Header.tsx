@@ -12,7 +12,7 @@ const navLinks = [
   { name: 'Shirts', href: '/collections/shirts' },
   { name: 'T-Shirts', href: '/collections/t-shirts' },
   { name: 'Pants', href: '/collections/pants' },
-  { name: 'Accessories', href: '/collections/accessories' },
+  { name: 'Jackets', href: '/collections/jackets' },
 ];
 
 export default function Header() {
@@ -147,13 +147,22 @@ export default function Header() {
                             My Orders
                           </Link>
                           {user.role === 'admin' && (
-                            <Link
-                              href="/admin/dashboard"
-                              onClick={() => setUserMenuOpen(false)}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-200 mt-1 pt-2"
-                            >
-                              Dashboard
-                            </Link>
+                            <>
+                              <Link
+                                href="/admin/dashboard"
+                                onClick={() => setUserMenuOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-200 mt-1 pt-2"
+                              >
+                                Dashboard
+                              </Link>
+                              <Link
+                                href="/admin/homepage-settings"
+                                onClick={() => setUserMenuOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                              >
+                                Homepage Settings
+                              </Link>
+                            </>
                           )}
                           <button
                             onClick={() => {
