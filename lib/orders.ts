@@ -87,6 +87,11 @@ export async function createOrder(data: {
   total: number;
   shippingAddress: Order['shippingAddress'];
 }): Promise<Order> {
+  if (USE_DATABASE) {
+    const { createOrderInDB } = await import('./orders-db');
+    return createOrderInDB(data);
+  }
+
   const order: Order = {
     id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     orderId: data.orderId,

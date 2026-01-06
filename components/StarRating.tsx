@@ -43,17 +43,8 @@ export default function StarRating({
           const isFilled = starValue <= Math.round(rating);
           const isHalf = starValue - 0.5 <= rating && rating < starValue;
 
-          return (
-            <button
-              key={i}
-              type="button"
-              onClick={() => handleClick(starValue)}
-              onMouseEnter={() => handleMouseEnter(starValue)}
-              disabled={!interactive}
-              className={`${sizeClasses[size]} ${
-                interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'
-              } ${!interactive ? 'pointer-events-none' : ''}`}
-            >
+          const starContent = (
+            <>
               {isFilled ? (
                 <svg
                   className={`${sizeClasses[size]} text-yellow-400 fill-current`}
@@ -85,7 +76,30 @@ export default function StarRating({
                   <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                 </svg>
               )}
-            </button>
+            </>
+          );
+
+          if (interactive) {
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleClick(starValue)}
+                onMouseEnter={() => handleMouseEnter(starValue)}
+                className={`${sizeClasses[size]} cursor-pointer hover:scale-110 transition-transform`}
+              >
+                {starContent}
+              </button>
+            );
+          }
+
+          return (
+            <div
+              key={i}
+              className={`${sizeClasses[size]} cursor-default`}
+            >
+              {starContent}
+            </div>
           );
         })}
       </div>

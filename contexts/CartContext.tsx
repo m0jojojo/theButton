@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { trackAddToCart } from '@/lib/analytics';
+import { useAuth } from './AuthContext';
 
 export interface CartItem {
   id: string;
@@ -29,6 +30,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { user } = useAuth();
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -47,6 +49,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setIsLoaded(true);
     }
   }, []);
+
+  // Clear cart when user logs out
+  useEffect(() => {
+    if (isLoaded && !user) {
+      setItems([]);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('theButton_cart');
+      }
+    }
+  }, [user, isLoaded]);
 
   // Save cart to localStorage whenever it changes (but not on initial load)
   useEffect(() => {

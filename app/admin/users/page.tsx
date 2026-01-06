@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import AdminGuard from '@/components/AdminGuard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
@@ -241,8 +241,8 @@ export default function AdminUsersPage() {
                         const isLoadingOrders = loadingOrders.has(user.id);
                         
                         return (
-                          <>
-                            <tr key={user.id}>
+                          <Fragment key={user.id}>
+                            <tr>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {user.name}
                               </td>
@@ -365,7 +365,7 @@ export default function AdminUsersPage() {
                                 </td>
                               </tr>
                             )}
-                          </>
+                          </Fragment>
                         );
                       })
                     )}

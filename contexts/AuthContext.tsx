@@ -170,6 +170,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('theButton_token');
       localStorage.removeItem('theButton_user');
+      // Clear cart when user logs out
+      localStorage.removeItem('theButton_cart');
     }
   };
 

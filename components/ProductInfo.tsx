@@ -113,9 +113,17 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Review Stars */}
       {reviewStats && reviewStats.totalReviews > 0 && (
-        <button
+        <div
           onClick={scrollToReviews}
-          className="flex items-center gap-2 group hover:opacity-80 transition-opacity"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              scrollToReviews();
+            }
+          }}
+          className="flex items-center gap-2 group hover:opacity-80 transition-opacity cursor-pointer"
           aria-label={`${reviewStats.averageRating.toFixed(1)} out of 5 stars, ${reviewStats.totalReviews} reviews. Click to view reviews.`}
         >
           <StarRating
@@ -126,7 +134,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
             ({reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'})
           </span>
-        </button>
+        </div>
       )}
 
       {/* Price & Discount */}

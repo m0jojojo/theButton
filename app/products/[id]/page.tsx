@@ -33,7 +33,7 @@ export default async function ProductPage({
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Image Gallery */}
-          <div className="sticky top-20 self-start">
+          <div className="lg:sticky lg:top-20 lg:self-start">
             <ImageGallery images={product.images} productName={product.name} />
           </div>
 

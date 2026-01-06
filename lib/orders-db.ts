@@ -144,6 +144,63 @@ export async function getOrdersByUserEmailFromDB(userEmail: string): Promise<Ord
 }
 
 /**
+ * Create order in database
+ */
+export async function createOrderInDB(data: {
+  orderId: string;
+  userId: string;
+  userEmail: string;
+  paymentMethod: 'razorpay' | 'cod';
+  paymentStatus: 'pending' | 'paid' | 'failed';
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  shippingAddress: Order['shippingAddress'];
+}): Promise<Order> {
+  try {
+    const normalizedEmail = data.userEmail.toLowerCase();
+    
+    // Create order with items in a transaction
+    const order = await prisma.order.create({
+      data: {
+        orderId: data.orderId,
+        userId: data.userId || null,
+        userEmail: normalizedEmail,
+        status: data.paymentMethod === 'cod' ? 'pending' : 'confirmed',
+        paymentMethod: data.paymentMethod,
+        paymentStatus: data.paymentStatus,
+        subtotal: new Prisma.Decimal(data.subtotal),
+        shipping: new Prisma.Decimal(data.shipping),
+        total: new Prisma.Decimal(data.total),
+        shippingAddress: data.shippingAddress as Prisma.JsonObject,
+        items: {
+          create: data.items.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            price: new Prisma.Decimal(item.price),
+            compareAtPrice: item.compareAtPrice ? new Prisma.Decimal(item.compareAtPrice) : null,
+            size: item.size,
+            quantity: item.quantity,
+            image: item.image,
+          })),
+        },
+      },
+      include: {
+        items: true,
+      },
+    });
+
+    console.log(`[orders-db.ts] Order created: ${order.orderId} for user: ${normalizedEmail} (ID: ${data.userId})`);
+    
+    return prismaToOrder(order);
+  } catch (error) {
+    console.error('[orders-db.ts] Error creating order:', error);
+    throw error;
+  }
+}
+
+/**
  * Update order status in database
  */
 export async function updateOrderStatusInDB(id: string, status: OrderStatus): Promise<Order | null> {
