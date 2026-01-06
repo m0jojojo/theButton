@@ -79,7 +79,7 @@ export default async function AllProductsPage() {
                   {product.name}
                 </h3>
                 <div className="mb-1">
-                  <ProductReviewStars productId={product.id} size="sm" />
+                  <ProductReviewStars productId={product.id} size="sm" noLink={true} />
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-base md:text-lg font-bold">

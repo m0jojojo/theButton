@@ -103,23 +103,21 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
                 <p className="text-xs text-gray-600 truncate">{product.name}</p>
               </div>
 
-              {/* Size Selector (Compact) */}
-              {!selectedSize && (
-                <select
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  defaultValue=""
-                >
-                  <option value="" disabled>Size</option>
-                  {product.sizes
-                    .filter((size) => size.available)
-                    .map((size) => (
-                      <option key={size.value} value={size.value}>
-                        {size.value}
-                      </option>
-                    ))}
-                </select>
-              )}
+              {/* Size Selector Dropdown */}
+              <select
+                value={selectedSize || ''}
+                onChange={(e) => setSelectedSize(e.target.value || null)}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white text-gray-900"
+              >
+                <option value="">Size</option>
+                {product.sizes
+                  .filter((size) => size.available)
+                  .map((size) => (
+                    <option key={size.value} value={size.value}>
+                      {size.value}
+                    </option>
+                  ))}
+              </select>
 
               {/* Add to Cart Button */}
               <button
@@ -132,15 +130,11 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : showAdded
                       ? 'bg-green-600 text-white'
-                      : !selectedSize
-                      ? 'bg-gray-900 text-white hover:bg-gray-800 active:scale-95'
                       : 'bg-gray-900 text-white hover:bg-gray-800 active:scale-95'
                   }
                 `}
               >
-                {!selectedSize
-                  ? 'Select Size'
-                  : !product.inStock
+                {!product.inStock
                   ? 'Out of Stock'
                   : showAdded
                   ? '✓ Added!'

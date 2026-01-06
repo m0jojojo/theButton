@@ -116,7 +116,7 @@ export default async function CollectionPage({
                   {product.name}
                 </h3>
                 <div className="mb-1">
-                  <ProductReviewStars productId={product.id} size="sm" />
+                  <ProductReviewStars productId={product.id} size="sm" noLink={true} />
                 </div>
                 <p className="text-base md:text-lg font-bold">
                   {formatPrice(product.price)}

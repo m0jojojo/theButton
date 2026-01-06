@@ -9,6 +9,7 @@ interface ProductReviewStarsProps {
   size?: 'sm' | 'md' | 'lg';
   showCount?: boolean;
   className?: string;
+  noLink?: boolean; // Disable link when inside another link
 }
 
 export default function ProductReviewStars({
@@ -16,6 +17,7 @@ export default function ProductReviewStars({
   size = 'sm',
   showCount = true,
   className = '',
+  noLink = false,
 }: ProductReviewStarsProps) {
   const [reviewStats, setReviewStats] = useState<{
     averageRating: number;
@@ -54,6 +56,29 @@ export default function ProductReviewStars({
     return null; // Don't show if no reviews
   }
 
+  const content = (
+    <>
+      <StarRating
+        rating={reviewStats.averageRating}
+        size={size}
+        showValue={false}
+      />
+      {showCount && (
+        <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">
+          ({reviewStats.totalReviews})
+        </span>
+      )}
+    </>
+  );
+
+  if (noLink) {
+    return (
+      <div className={`flex items-center gap-1.5 ${className}`}>
+        {content}
+      </div>
+    );
+  }
+
   return (
     <Link
       href={`/products/${productId}#product-reviews`}
@@ -70,16 +95,7 @@ export default function ProductReviewStars({
       }}
       aria-label={`${reviewStats.averageRating.toFixed(1)} out of 5 stars, ${reviewStats.totalReviews} reviews. Click to view reviews.`}
     >
-      <StarRating
-        rating={reviewStats.averageRating}
-        size={size}
-        showValue={false}
-      />
-      {showCount && (
-        <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">
-          ({reviewStats.totalReviews})
-        </span>
-      )}
+      {content}
     </Link>
   );
 }

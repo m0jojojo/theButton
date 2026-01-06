@@ -121,7 +121,7 @@ export default function CartUpsells() {
                 {product.name}
               </h4>
               <div className="mb-1">
-                <ProductReviewStars productId={product.id} size="sm" />
+                <ProductReviewStars productId={product.id} size="sm" noLink={true} />
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <p className="text-xs font-bold text-gray-900">{formatPrice(product.price)}</p>
