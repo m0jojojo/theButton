@@ -6,16 +6,13 @@ import AdminGuard from '@/components/AdminGuard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
 import ImageCropper from '@/components/ImageCropper';
+import { shopCategories } from '@/lib/categories';
 
 interface HomepageSettings {
   id: string;
   heroBannerImage: string | null;
-  collectionImages: {
-    shirts?: string;
-    tShirts?: string;
-    pants?: string;
-    jackets?: string;
-  };
+  heroSlides: string[];
+  collectionImages: Record<string, string>;
 }
 
 export default function HomepageSettingsPage() {
@@ -26,12 +23,11 @@ export default function HomepageSettingsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  const [formData, setFormData] = useState({
-    heroBannerImage: '',
-    shirts: '',
-    tShirts: '',
-    pants: '',
-    jackets: '',
+  const [formData, setFormData] = useState<Record<string, string>>({
+    heroSlide1: '',
+    heroSlide2: '',
+    heroSlide3: '',
+    ...Object.fromEntries(shopCategories.map((category) => [category.slug, ''])),
   });
 
   const [imageToCrop, setImageToCrop] = useState<{ type: string; data: string } | null>(null);
@@ -39,7 +35,7 @@ export default function HomepageSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const token = localStorage.getItem('theButton_token');
+        const token = localStorage.getItem('rangrez_token');
         const response = await fetch('/api/admin/homepage-settings', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -53,11 +49,15 @@ export default function HomepageSettingsPage() {
         const data = await response.json();
         setSettings(data.settings);
         setFormData({
-          heroBannerImage: data.settings.heroBannerImage || '',
-          shirts: data.settings.collectionImages?.shirts || '',
-          tShirts: data.settings.collectionImages?.tShirts || '',
-          pants: data.settings.collectionImages?.pants || '',
-          jackets: data.settings.collectionImages?.jackets || '',
+          heroSlide1: data.settings.heroSlides?.[0] || data.settings.heroBannerImage || '',
+          heroSlide2: data.settings.heroSlides?.[1] || '',
+          heroSlide3: data.settings.heroSlides?.[2] || '',
+          ...Object.fromEntries(
+            shopCategories.map((category) => [
+              category.slug,
+              data.settings.collectionImages?.[category.slug] || '',
+            ])
+          ),
         });
       } catch (err) {
         console.error('Error fetching homepage settings:', err);
@@ -125,22 +125,23 @@ export default function HomepageSettingsPage() {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('theButton_token');
+      const token = localStorage.getItem('rangrez_token');
       
       // Build collection images object, only including non-empty values
       const collectionImages: Record<string, string> = {};
-      if (formData.shirts) collectionImages.shirts = formData.shirts;
-      if (formData.tShirts) collectionImages.tShirts = formData.tShirts;
-      if (formData.pants) collectionImages.pants = formData.pants;
-      if (formData.jackets) collectionImages.jackets = formData.jackets;
+      shopCategories.forEach((category) => {
+        if (formData[category.slug]) {
+          collectionImages[category.slug] = formData[category.slug];
+        }
+      });
 
       const updateData = {
-        heroBannerImage: formData.heroBannerImage || null,
+        heroSlides: [formData.heroSlide1, formData.heroSlide2, formData.heroSlide3].filter(Boolean),
         collectionImages: Object.keys(collectionImages).length > 0 ? collectionImages : {},
       };
 
       console.log('[Homepage Settings] Updating with data:', {
-        hasHeroBanner: !!updateData.heroBannerImage,
+        heroSlideCount: updateData.heroSlides.length,
         collectionImagesCount: Object.keys(updateData.collectionImages).length,
       });
 
@@ -216,8 +217,8 @@ export default function HomepageSettingsPage() {
                 </Link>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('theButton_token');
-                    localStorage.removeItem('theButton_user');
+                    localStorage.removeItem('rangrez_token');
+                    localStorage.removeItem('rangrez_user');
                     window.location.href = '/admin/login';
                   }}
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
@@ -293,25 +294,56 @@ export default function HomepageSettingsPage() {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Hero Banner Image */}
+                  {/* Hero Slideshow */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Hero Banner Image
-                    </label>
-                    <p className="text-sm text-gray-500 mb-4">
-                      This is the background image for the hero section on the homepage.
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Hero Slideshow
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Up to three square images for the homepage slideshow. They
+                      rotate automatically every 3 seconds; empty slots are skipped.
                     </p>
-                    {renderImagePreview(formData.heroBannerImage, 'Hero Banner')}
-                    <div className="mt-4">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleImageUpload('heroBannerImage', file);
-                        }}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-900 file:text-white hover:file:bg-gray-800"
-                      />
+
+                    <div className="space-y-6">
+                      {[
+                        { key: 'heroSlide1', label: 'Slide 1' },
+                        { key: 'heroSlide2', label: 'Slide 2' },
+                        { key: 'heroSlide3', label: 'Slide 3' },
+                      ].map((slide) => (
+                        <div key={slide.key}>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              {slide.label}
+                            </label>
+                            {formData[slide.key] && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setFormData((prev) => ({ ...prev, [slide.key]: '' }))
+                                }
+                                className="text-sm text-red-600 hover:text-red-700"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                          {renderImagePreview(
+                            formData[slide.key],
+                            slide.label
+                          )}
+                          <div className="mt-2">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(slide.key, file);
+                              }}
+                              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-900 file:text-white hover:file:bg-gray-800"
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -325,24 +357,19 @@ export default function HomepageSettingsPage() {
                     </p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {[
-                        { key: 'shirts', label: 'Shirts' },
-                        { key: 'tShirts', label: 'T-Shirts' },
-                        { key: 'pants', label: 'Pants' },
-                        { key: 'jackets', label: 'Jackets' },
-                      ].map((category) => (
-                        <div key={category.key}>
+                      {shopCategories.map((category) => (
+                        <div key={category.slug}>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {category.label}
+                            {category.name}
                           </label>
-                          {renderImagePreview(formData[category.key as keyof typeof formData], category.label)}
+                          {renderImagePreview(formData[category.slug], category.name)}
                           <div className="mt-2">
                             <input
                               type="file"
                               accept="image/*"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
-                                if (file) handleImageUpload(category.key, file);
+                                if (file) handleImageUpload(category.slug, file);
                               }}
                               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-900 file:text-white hover:file:bg-gray-800"
                             />
@@ -383,7 +410,7 @@ export default function HomepageSettingsPage() {
             handleCropComplete(croppedImage, imageToCrop.type);
           }}
           onCancel={() => setImageToCrop(null)}
-          aspect={imageToCrop.type === 'heroBannerImage' ? 16 / 9 : 1}
+          aspect={1}
           maxSize={2000}
         />
       )}

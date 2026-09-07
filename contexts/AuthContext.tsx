@@ -33,8 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Load auth state from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedToken = localStorage.getItem('theButton_token');
-      const savedUser = localStorage.getItem('theButton_user');
+      const savedToken = localStorage.getItem('rangrez_token');
+      const savedUser = localStorage.getItem('rangrez_user');
 
       if (savedToken && savedUser) {
         try {
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Update user data from server (in case it changed)
         setUser(data.user);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('theButton_user', JSON.stringify(data.user));
+          localStorage.setItem('rangrez_user', JSON.stringify(data.user));
         }
       } else if (response.status === 401) {
         // Token is definitely invalid (unauthorized), clear session
@@ -127,8 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(data.token);
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('theButton_token', data.token);
-      localStorage.setItem('theButton_user', JSON.stringify(userData));
+      localStorage.setItem('rangrez_token', data.token);
+      localStorage.setItem('rangrez_user', JSON.stringify(userData));
     }
   };
 
@@ -158,8 +158,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(data.token);
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('theButton_token', data.token);
-      localStorage.setItem('theButton_user', JSON.stringify(userData));
+      localStorage.setItem('rangrez_token', data.token);
+      localStorage.setItem('rangrez_user', JSON.stringify(userData));
     }
   };
 
@@ -168,10 +168,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('theButton_token');
-      localStorage.removeItem('theButton_user');
+      localStorage.removeItem('rangrez_token');
+      localStorage.removeItem('rangrez_user');
       // Clear cart when user logs out
-      localStorage.removeItem('theButton_cart');
+      localStorage.removeItem('rangrez_cart');
     }
   };
 
@@ -186,7 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updated = { ...user, ...data };
       setUser(updated);
       if (typeof window !== 'undefined') {
-        localStorage.setItem('theButton_user', JSON.stringify(updated));
+        localStorage.setItem('rangrez_user', JSON.stringify(updated));
       }
     }
   };

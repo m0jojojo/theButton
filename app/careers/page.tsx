@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Careers',
-  description: 'Join The Button team',
+  description: 'Join Rangrez team',
 };
 
 export default function CareersPage() {

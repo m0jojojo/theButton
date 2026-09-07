@@ -1,18 +1,18 @@
 export const metadata = {
   title: 'About Us',
-  description: 'Learn about The Button - Premium menswear from Rewari',
+  description: 'Learn about Rangrez - Premium menswear from Rewari',
 };
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-      <h1 className="text-4xl md:text-5xl font-bold mb-8">About The Button</h1>
+      <h1 className="text-4xl md:text-5xl font-bold mb-8">About Rangrez</h1>
       
       <div className="prose prose-lg max-w-none">
         <section className="mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Our Story</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            The Button was born from a simple belief: every man deserves access to premium quality 
+            Rangrez was born from a simple belief: every man deserves access to premium quality 
             menswear that doesn&apos;t break the bank. Based in Rewari, we&apos;re passionate about bringing 
             you carefully curated fashion that combines style, quality, and value.
           </p>

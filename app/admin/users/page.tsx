@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('theButton_token');
+        const token = localStorage.getItem('rangrez_token');
         const response = await fetch('/api/admin/users', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
     // Otherwise, fetch orders
     setLoadingOrders((prev) => new Set(prev).add(userId));
     try {
-      const token = localStorage.getItem('theButton_token');
+      const token = localStorage.getItem('rangrez_token');
       const response = await fetch(`/api/admin/users/${userId}/orders`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -135,8 +135,8 @@ export default function AdminUsersPage() {
                 </Link>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('theButton_token');
-                    localStorage.removeItem('theButton_user');
+                    localStorage.removeItem('rangrez_token');
+                    localStorage.removeItem('rangrez_user');
                     window.location.href = '/admin/login';
                   }}
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"

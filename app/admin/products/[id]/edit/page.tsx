@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
 import ImageCropper from '@/components/ImageCropper';
 import { Product } from '@/lib/products';
+import { shopCategories } from '@/lib/categories';
 
 export default function EditProductPage() {
   const params = useParams();
@@ -77,7 +78,7 @@ export default function EditProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem('theButton_token');
+        const token = localStorage.getItem('rangrez_token');
         const response = await fetch(`/api/admin/products/${productId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -286,7 +287,7 @@ export default function EditProductPage() {
         throw new Error('At least one image is required');
       }
 
-      const token = localStorage.getItem('theButton_token');
+      const token = localStorage.getItem('rangrez_token');
       const response = await fetch(`/api/admin/products/${productId}`, {
         method: 'PATCH',
         headers: {
@@ -342,8 +343,8 @@ export default function EditProductPage() {
                 </Link>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('theButton_token');
-                    localStorage.removeItem('theButton_user');
+                    localStorage.removeItem('rangrez_token');
+                    localStorage.removeItem('rangrez_user');
                     window.location.href = '/admin/login';
                   }}
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
@@ -479,10 +480,11 @@ export default function EditProductPage() {
                     >
                       <option value="">Select Collection</option>
                       <option value="New Arrivals">New Arrivals</option>
-                      <option value="Shirts">Shirts</option>
-                      <option value="T-Shirts">T-Shirts</option>
-                      <option value="Pants">Pants</option>
-                      <option value="Jackets">Jackets</option>
+                      {shopCategories.map((category) => (
+                        <option key={category.slug} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 

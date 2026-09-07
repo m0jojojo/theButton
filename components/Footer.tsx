@@ -3,9 +3,9 @@ import Link from 'next/link';
 const footerLinks = {
   shop: [
     { name: 'New Arrivals', href: '/collections/new-arrivals' },
-    { name: 'Shirts', href: '/collections/shirts' },
-    { name: 'T-Shirts', href: '/collections/t-shirts' },
-    { name: 'Pants', href: '/collections/pants' },
+    { name: 'Sarees', href: '/collections/sarees' },
+    { name: 'Suits', href: '/collections/suits' },
+    { name: 'Kurtis', href: '/collections/kurtis' },
   ],
   company: [
     { name: 'About Us', href: '/about' },
@@ -27,7 +27,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <h3 className="text-2xl font-bold text-white mb-4">The Button</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Rangrez</h3>
             <p className="text-sm mb-4">
               Premium menswear from Rewari. Quality fashion for the modern man.
             </p>
@@ -111,12 +111,12 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} The Button. All rights reserved.
+              © {new Date().getFullYear()} Rangrez. All rights reserved.
             </p>
             <div className="flex space-x-6">
               {/* Social links - placeholder */}
               <a
-                href="https://instagram.com/thebutton"
+                href="https://instagram.com/rangrez"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -127,7 +127,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://facebook.com/thebutton"
+                href="https://facebook.com/rangrez"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"

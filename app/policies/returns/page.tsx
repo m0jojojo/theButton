@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Return Policy',
-  description: 'Return and exchange policy for The Button',
+  description: 'Return and exchange policy for Rangrez',
 };
 
 export default function ReturnPolicyPage() {

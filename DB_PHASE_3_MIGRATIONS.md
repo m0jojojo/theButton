@@ -82,7 +82,7 @@ npm run db:seed
 ```
 
 This creates:
-- 1 admin user (admin@thebutton.com / admin123)
+- 1 admin user (admin@rangrez.com / admin123)
 - 1 customer user (customer@example.com / password123)
 - 3 sample products
 - 1 sample order

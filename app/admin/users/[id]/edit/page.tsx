@@ -35,7 +35,7 @@ export default function EditUserPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('theButton_token');
+        const token = localStorage.getItem('rangrez_token');
         const response = await fetch(`/api/admin/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -73,7 +73,7 @@ export default function EditUserPage() {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('theButton_token');
+      const token = localStorage.getItem('rangrez_token');
       
       // Only include password if it's been entered
       const updateData: any = {
@@ -149,8 +149,8 @@ export default function EditUserPage() {
                 </Link>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('theButton_token');
-                    localStorage.removeItem('theButton_user');
+                    localStorage.removeItem('rangrez_token');
+                    localStorage.removeItem('rangrez_user');
                     window.location.href = '/admin/login';
                   }}
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"

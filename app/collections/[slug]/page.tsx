@@ -3,27 +3,34 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getProductsByCollectionFromDB } from '@/lib/products-db';
 import ProductReviewStars from '@/components/ProductReviewStars';
+import { shopCategories } from '@/lib/categories';
 
 const collectionInfo: Record<string, { name: string; description: string }> = {
+  ...Object.fromEntries(
+    shopCategories.map((category) => [
+      category.slug,
+      { name: category.name, description: category.description },
+    ])
+  ),
   'new-arrivals': {
     name: 'New Arrivals',
     description: 'Latest additions to our collection',
   },
-  'shirts': {
-    name: 'Shirts',
-    description: 'Premium quality shirts for every occasion',
+  'sarees': {
+    name: 'Sarees',
+    description: 'Elegant sarees for every occasion',
   },
-  't-shirts': {
-    name: 'T-Shirts',
-    description: 'Comfortable and stylish t-shirts',
+  'suits': {
+    name: 'Suits',
+    description: 'Graceful salwar suits and sets',
   },
-  'pants': {
-    name: 'Pants',
-    description: 'Perfect fit pants for all occasions',
+  'kurtis': {
+    name: 'Kurtis',
+    description: 'Comfortable and stylish kurtis',
   },
-  'jackets': {
-    name: 'Jackets',
-    description: 'Stylish jackets for every season',
+  'lehengas': {
+    name: 'Lehengas',
+    description: 'Festive and bridal lehengas',
   },
 };
 

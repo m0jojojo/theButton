@@ -233,8 +233,9 @@ model WhatsAppEvent {
 
 model HomepageSettings {
   id                String   @id @default("homepage") // Singleton - only one record
-  heroBannerImage   String?  @map("hero_banner_image") @db.Text // Base64 or URL
-  collectionImages  Json     @map("collection_images") // { shirts: string, tShirts: string, pants: string, jackets: string }
+  heroBannerImage   String?  @map("hero_banner_image") @db.Text // Legacy single banner, used as a fallback slide
+  heroSlides        Json     @default("[]") @map("hero_slides") // string[] of up to 3 slideshow images (base64 or URL)
+  collectionImages  Json     @map("collection_images") // { sarees: string, suits: string, kurtis: string, lehengas: string }
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 

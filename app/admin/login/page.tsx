@@ -24,15 +24,15 @@ export default function AdminLoginPage() {
 
       // Check if user is admin from localStorage (login function already stored it)
       if (typeof window !== 'undefined') {
-        const savedUser = localStorage.getItem('theButton_user');
+        const savedUser = localStorage.getItem('rangrez_user');
         if (savedUser) {
           const user = JSON.parse(savedUser);
           if (user.role !== 'admin') {
             setError('Access denied. Admin privileges required.');
             setIsLoading(false);
             // Logout the non-admin user
-            localStorage.removeItem('theButton_token');
-            localStorage.removeItem('theButton_user');
+            localStorage.removeItem('rangrez_token');
+            localStorage.removeItem('rangrez_user');
             return;
           }
         }

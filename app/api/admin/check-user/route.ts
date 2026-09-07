@@ -3,7 +3,7 @@ import { getUserByEmail, getAllUsers } from '@/lib/users';
 
 export async function GET() {
   try {
-    const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@thebutton.com';
+    const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@rangrez.com';
     
     // Check if admin user exists
     const adminUser = await getUserByEmail(adminEmail);

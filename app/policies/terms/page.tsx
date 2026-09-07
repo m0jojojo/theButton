@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Terms of Service',
-  description: 'Terms of service for The Button',
+  description: 'Terms of service for Rangrez',
 };
 
 export default function TermsOfServicePage() {
@@ -18,7 +18,7 @@ export default function TermsOfServicePage() {
         <section className="mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Agreement to Terms</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            By accessing and using The Button website, you agree to be bound by these Terms of Service. 
+            By accessing and using Rangrez website, you agree to be bound by these Terms of Service. 
             If you do not agree to these terms, please do not use our website.
           </p>
         </section>
@@ -42,7 +42,7 @@ export default function TermsOfServicePage() {
         <section className="mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Limitation of Liability</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            The Button shall not be liable for any indirect, incidental, special, or consequential 
+            Rangrez shall not be liable for any indirect, incidental, special, or consequential 
             damages arising from your use of our website or products.
           </p>
         </section>

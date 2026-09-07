@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with The Button',
+  description: 'Get in touch with Rangrez',
 };
 
 export default function ContactPage() {
@@ -41,7 +41,7 @@ export default function ContactPage() {
         <section className="mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Location</h2>
           <p className="text-gray-700 mb-2 leading-relaxed">
-            <strong>The Button</strong>
+            <strong>Rangrez</strong>
           </p>
           <p className="text-gray-700 mb-2 leading-relaxed">
             Rewari, Haryana, India

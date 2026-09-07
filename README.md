@@ -1,4 +1,4 @@
-# The Button - Premium Menswear D2C Website
+# Rangrez - Premium Menswear D2C Website
 
 A high-conversion D2C menswear website optimized for Instagram traffic, mobile-first users, and WhatsApp-driven conversions.
 
@@ -41,7 +41,7 @@ npm start
 ## Project Structure
 
 ```
-theButton/
+rangrez/
 ├── app/                    # Next.js App Router
 │   ├── layout.tsx         # Root layout with SEO & Analytics
 │   ├── page.tsx           # Home page
@@ -115,7 +115,7 @@ Create a `.env.local` file:
 
 ```env
 # Site Configuration
-NEXT_PUBLIC_SITE_URL=https://thebutton.in
+NEXT_PUBLIC_SITE_URL=https://rangrez.in
 
 # Analytics (Optional)
 NEXT_PUBLIC_META_PIXEL_ID=your_meta_pixel_id
@@ -142,5 +142,5 @@ The site will be live at `https://your-project.vercel.app`
 
 ## License
 
-Private - The Button (Rewari)
+Private - Rangrez (Rewari)
 

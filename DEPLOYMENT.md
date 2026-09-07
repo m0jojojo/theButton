@@ -1,4 +1,4 @@
-# Deployment Guide - The Button
+# Deployment Guide - Rangrez
 
 ## Pre-Deployment Checklist
 
@@ -12,7 +12,7 @@
 ## Environment Variables
 
 ### Required
-- `NEXT_PUBLIC_SITE_URL` - Your production site URL (e.g., `https://thebutton.in`)
+- `NEXT_PUBLIC_SITE_URL` - Your production site URL (e.g., `https://rangrez.in`)
 
 ### Optional (but recommended)
 - `NEXT_PUBLIC_META_PIXEL_ID` - Facebook Pixel ID for tracking
@@ -48,11 +48,11 @@
    - `NEXT_PUBLIC_RAZORPAY_KEY_ID` (if using)
 8. Click "Deploy"
 9. Wait for deployment (2-3 minutes)
-10. Your site will be live at `https://thebutton-xxx.vercel.app`
+10. Your site will be live at `https://rangrez-xxx.vercel.app`
 
 **Custom Domain:**
 - Go to Project Settings → Domains
-- Add your custom domain (e.g., `thebutton.in`)
+- Add your custom domain (e.g., `rangrez.in`)
 - Follow DNS configuration instructions
 
 ### Option 2: Netlify

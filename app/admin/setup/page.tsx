@@ -135,7 +135,7 @@ export default function AdminSetupPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Setup</h2>
             <p className="text-gray-600 mb-4 text-sm">
-              Create a default admin user with predefined credentials (admin@thebutton.com / admin123)
+              Create a default admin user with predefined credentials (admin@rangrez.com / admin123)
             </p>
             <button
               onClick={handleInitialize}

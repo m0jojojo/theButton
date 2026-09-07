@@ -37,7 +37,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Load cart from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedCart = localStorage.getItem('theButton_cart');
+      const savedCart = localStorage.getItem('rangrez_cart');
       if (savedCart) {
         try {
           const parsedCart = JSON.parse(savedCart);
@@ -66,7 +66,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (isLoaded && prevUserRef.current !== null && user === null) {
       setItems([]);
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('theButton_cart');
+        localStorage.removeItem('rangrez_cart');
       }
     }
 
@@ -78,7 +78,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window !== 'undefined' && isLoaded) {
       try {
-        localStorage.setItem('theButton_cart', JSON.stringify(items));
+        localStorage.setItem('rangrez_cart', JSON.stringify(items));
       } catch (error) {
         console.error('Error saving cart to localStorage:', error);
       }

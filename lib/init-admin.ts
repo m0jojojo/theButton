@@ -3,7 +3,7 @@
 
 import { getAllUsers, createUser } from './users';
 
-const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@thebutton.com';
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@rangrez.com';
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
 
 const DEFAULT_CUSTOMER_EMAIL = process.env.DEFAULT_CUSTOMER_EMAIL || 'customer@example.com';

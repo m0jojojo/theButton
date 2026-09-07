@@ -231,7 +231,7 @@ export default function CheckoutForm({
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
             amount: total * 100, // Convert to paise
             currency: 'INR',
-            name: 'The Button',
+            name: 'Rangrez',
             description: `Order ${orderId}`,
             order_id: razorpayOrderId,
             handler: (response) => {

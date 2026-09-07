@@ -3,7 +3,7 @@ import { createUser, getUserByEmail, getAllUsers } from '@/lib/users';
 import { signToken } from '@/lib/jwt';
 
 // Default admin credentials (change in production!)
-const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@thebutton.com';
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@rangrez.com';
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
 
 export async function POST(request: NextRequest) {

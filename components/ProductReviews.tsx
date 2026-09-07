@@ -65,7 +65,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   };
 
   const handleSubmitReview = async (rating: number, comment: string) => {
-    const token = localStorage.getItem('theButton_token');
+    const token = localStorage.getItem('rangrez_token');
     const response = await fetch('/api/reviews', {
       method: 'POST',
       headers: {
@@ -93,7 +93,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   const handleVote = async (reviewId: string, helpful: boolean) => {
     if (!user) return;
 
-    const token = localStorage.getItem('theButton_token');
+    const token = localStorage.getItem('rangrez_token');
     const response = await fetch(`/api/reviews/${reviewId}/vote`, {
       method: 'POST',
       headers: {

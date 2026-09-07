@@ -14,7 +14,7 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem('theButton_token');
+        const token = localStorage.getItem('rangrez_token');
         const response = await fetch('/api/admin/orders', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -55,8 +55,8 @@ export default function AdminOrdersPage() {
                 </Link>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('theButton_token');
-                    localStorage.removeItem('theButton_user');
+                    localStorage.removeItem('rangrez_token');
+                    localStorage.removeItem('rangrez_user');
                     window.location.href = '/admin/login';
                   }}
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"

@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Privacy Policy',
-  description: 'Privacy policy for The Button',
+  description: 'Privacy policy for Rangrez',
 };
 
 export default function PrivacyPolicyPage() {

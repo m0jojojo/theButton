@@ -1,4 +1,4 @@
-# Quick Testing Guide - The Button
+# Quick Testing Guide - Rangrez
 
 ## ✅ Automated Tests (Already Passed)
 

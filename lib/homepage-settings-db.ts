@@ -9,12 +9,9 @@ import { prisma } from '@/lib/prisma';
 export interface HomepageSettings {
   id: string;
   heroBannerImage: string | null;
-  collectionImages: {
-    shirts?: string;
-    tShirts?: string;
-    pants?: string;
-    jackets?: string;
-  };
+  heroSlides: string[];
+  // Keyed by category slug (see lib/categories.ts)
+  collectionImages: Record<string, string>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,6 +37,7 @@ export async function getHomepageSettingsFromDB(): Promise<HomepageSettings | nu
         data: {
           id: 'homepage',
           heroBannerImage: null,
+          heroSlides: [],
           collectionImages: {},
         },
       });
@@ -48,6 +46,7 @@ export async function getHomepageSettingsFromDB(): Promise<HomepageSettings | nu
     return {
       id: settings.id,
       heroBannerImage: settings.heroBannerImage,
+      heroSlides: Array.isArray(settings.heroSlides) ? (settings.heroSlides as string[]) : [],
       collectionImages: settings.collectionImages as HomepageSettings['collectionImages'],
       createdAt: settings.createdAt,
       updatedAt: settings.updatedAt,
@@ -87,6 +86,7 @@ export async function updateHomepageSettingsInDB(
         where: { id: 'homepage' },
         data: {
           ...(data.heroBannerImage !== undefined && { heroBannerImage: data.heroBannerImage }),
+          ...(data.heroSlides !== undefined && { heroSlides: data.heroSlides }),
           ...(data.collectionImages && { collectionImages: data.collectionImages }),
         },
       });
@@ -96,6 +96,7 @@ export async function updateHomepageSettingsInDB(
         data: {
           id: 'homepage',
           heroBannerImage: data.heroBannerImage || null,
+          heroSlides: data.heroSlides || [],
           collectionImages: data.collectionImages || {},
         },
       });
@@ -104,6 +105,7 @@ export async function updateHomepageSettingsInDB(
     return {
       id: settings.id,
       heroBannerImage: settings.heroBannerImage,
+      heroSlides: Array.isArray(settings.heroSlides) ? (settings.heroSlides as string[]) : [],
       collectionImages: settings.collectionImages as HomepageSettings['collectionImages'],
       createdAt: settings.createdAt,
       updatedAt: settings.updatedAt,

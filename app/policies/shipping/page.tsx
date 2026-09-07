@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Shipping Policy',
-  description: 'Shipping information and delivery details for The Button',
+  description: 'Shipping information and delivery details for Rangrez',
 };
 
 export default function ShippingPolicyPage() {

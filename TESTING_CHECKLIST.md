@@ -1,4 +1,4 @@
-# The Button - Testing Checklist
+# Rangrez - Testing Checklist
 
 ## Phase 7: Performance, QA & Polish Testing
 

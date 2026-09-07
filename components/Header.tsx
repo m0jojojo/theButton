@@ -6,18 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchBar from './SearchBar';
+import AnnouncementBar from './AnnouncementBar';
 
 const navLinks = [
   { name: 'All Products', href: '/products' },
   { name: 'New Arrivals', href: '/collections/new-arrivals' },
-  { name: 'Shirts', href: '/collections/shirts' },
-  { name: 'T-Shirts', href: '/collections/t-shirts' },
-  { name: 'Pants', href: '/collections/pants' },
-  { name: 'Jackets', href: '/collections/jackets' },
+  { name: 'Sarees', href: '/collections/sarees' },
+  { name: 'Suits', href: '/collections/suits' },
+  { name: 'Kurtis', href: '/collections/kurtis' },
+  { name: 'Lehengas', href: '/collections/lehengas' },
 ];
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { getItemCount } = useCart();
   const { user, logout, isLoading } = useAuth();
@@ -41,40 +43,59 @@ export default function Header() {
     };
   }, [userMenuOpen]);
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((open) => !open);
+    setMobileSearchOpen(false);
+  };
+
+  const toggleMobileSearch = () => {
+    setMobileSearchOpen((open) => !open);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <>
+      <AnnouncementBar />
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link 
-            href="/" 
-            className="flex items-center gap-2 text-2xl md:text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity text-gray-900"
-          >
-            <span className="flex items-baseline">
-              <span>THE</span>
-              <span className="ml-2 md:ml-3">BUTT</span>
-              {/* Button Icon replacing O */}
-              <span className="relative inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 mx-1">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="w-full h-full text-gray-900"
-                  fill="currentColor"
-                >
-                  {/* Outer circle */}
-                  <circle cx="12" cy="12" r="10" fill="currentColor" />
-                  {/* Button holes - 4 dots in square pattern */}
-                  <circle cx="9" cy="9" r="1.5" fill="white" />
-                  <circle cx="15" cy="9" r="1.5" fill="white" />
-                  <circle cx="9" cy="15" r="1.5" fill="white" />
-                  <circle cx="15" cy="15" r="1.5" fill="white" />
+        <div className="flex items-center h-16 md:h-20">
+          {/* Left: hamburger on mobile, logo on desktop */}
+          <div className="flex flex-1 md:flex-none items-center">
+            <button
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={toggleMobileMenu}
+              className="md:hidden -ml-2 p-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              </span>
-              <span>N</span>
-            </span>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+
+            <Link
+              href="/"
+              className="hidden md:flex items-center gap-2 text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity text-gray-900"
+            >
+              RANGREZ
+            </Link>
+          </div>
+
+          {/* Logo - centered on mobile */}
+          <Link
+            href="/"
+            className="md:hidden text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity text-gray-900"
+          >
+            RANGREZ
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 mx-auto">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -87,11 +108,29 @@ export default function Header() {
           </nav>
 
           {/* Right side actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-1 md:flex-none items-center justify-end space-x-1 md:space-x-4">
             {/* Search Bar - Desktop */}
             <div className="hidden md:block">
               <SearchBar />
             </div>
+
+            {/* Search toggle - Mobile (outside the hamburger menu) */}
+            <button
+              aria-label="Search"
+              aria-expanded={mobileSearchOpen}
+              onClick={toggleMobileSearch}
+              className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {mobileSearchOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              )}
+            </button>
 
             {/* User Menu - Desktop */}
             {!isLoading && (
@@ -214,46 +253,26 @@ export default function Header() {
                 </span>
               )}
             </Link>
-
-            {/* Mobile menu button */}
-            <button
-              aria-label="Toggle menu"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              {mobileMenuOpen ? (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
-            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Search - lives in the bar itself, not in the hamburger menu */}
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden border-t border-gray-200 bg-white overflow-hidden"
+          >
+            <div className="container mx-auto px-4 py-3">
+              <SearchBar mobile onClose={() => setMobileSearchOpen(false)} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Navigation Menu */}
       <AnimatePresence>
@@ -266,11 +285,6 @@ export default function Header() {
             className="md:hidden border-t border-gray-200 bg-white"
           >
             <div className="container mx-auto px-4 py-4 space-y-3">
-              {/* Mobile Search Bar */}
-              <div className="pb-3 border-b border-gray-200">
-                <SearchBar mobile onClose={() => setMobileMenuOpen(false)} />
-              </div>
-              
               {/* Mobile Auth Links */}
               {!isLoading && (
                 <>
@@ -336,7 +350,8 @@ export default function Header() {
           </motion.nav>
         )}
       </AnimatePresence>
-    </header>
+      </header>
+    </>
   );
 }
 

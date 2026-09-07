@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,22 +21,29 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+// Serif display face used for section headings.
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-serif',
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "The Button | Premium Menswear | Rewari",
-    template: "%s | The Button"
+    default: "Rangrez | Premium Menswear | Rewari",
+    template: "%s | Rangrez"
   },
-  description: "Premium menswear collection from The Button, Rewari. Shop the latest trends in men's fashion with fast delivery and easy returns.",
-  keywords: ["menswear", "men's fashion", "clothing", "Rewari", "The Button", "fashion"],
-  authors: [{ name: "The Button" }],
-  creator: "The Button",
-  publisher: "The Button",
+  description: "Premium menswear collection from Rangrez, Rewari. Shop the latest trends in men's fashion with fast delivery and easy returns.",
+  keywords: ["menswear", "men's fashion", "clothing", "Rewari", "Rangrez", "fashion"],
+  authors: [{ name: "Rangrez" }],
+  creator: "Rangrez",
+  publisher: "Rangrez",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://thebutton.in'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://rangrez.in'),
   alternates: {
     canonical: '/',
   },
@@ -44,22 +51,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: '/',
-    siteName: 'The Button',
-    title: 'The Button | Premium Menswear | Rewari',
-    description: 'Premium menswear collection from The Button, Rewari. Shop the latest trends in men\'s fashion.',
+    siteName: 'Rangrez',
+    title: 'Rangrez | Premium Menswear | Rewari',
+    description: 'Premium menswear collection from Rangrez, Rewari. Shop the latest trends in men\'s fashion.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'The Button - Premium Menswear',
+        alt: 'Rangrez - Premium Menswear',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Button | Premium Menswear | Rewari',
-    description: 'Premium menswear collection from The Button, Rewari.',
+    title: 'Rangrez | Premium Menswear | Rewari',
+    description: 'Premium menswear collection from Rangrez, Rewari.',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -87,7 +94,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

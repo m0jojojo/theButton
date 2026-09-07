@@ -33,11 +33,16 @@ export async function PATCH(request: NextRequest) {
     requireAdmin(token);
 
     const body = await request.json();
-    const { heroBannerImage, collectionImages } = body;
+    const { heroBannerImage, heroSlides, collectionImages } = body;
 
     const updateData: any = {};
     if (heroBannerImage !== undefined) {
       updateData.heroBannerImage = heroBannerImage || null;
+    }
+    if (heroSlides !== undefined) {
+      updateData.heroSlides = Array.isArray(heroSlides)
+        ? heroSlides.filter((slide: unknown) => typeof slide === 'string' && slide).slice(0, 3)
+        : [];
     }
     if (collectionImages !== undefined) {
       updateData.collectionImages = collectionImages;
