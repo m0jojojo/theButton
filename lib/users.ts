@@ -130,7 +130,9 @@ export async function updateUser(
     passwordHash = await bcrypt.hash(data.password, 10);
   }
 
-  const updated: User = {
+  // `data` may carry a plaintext `password`, which is hashed above and must
+  // never be stored, so it is stripped before the record is saved.
+  const updated: User & { password?: string } = {
     ...user,
     ...data,
     passwordHash,

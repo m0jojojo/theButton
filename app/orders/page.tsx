@@ -6,11 +6,12 @@ import AuthGuard from '@/components/AuthGuard';
 import OrderCard from '@/components/OrderCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
+import type { OrderStatus } from '@/lib/orders';
 
 interface Order {
   id: string;
   orderId: string;
-  status: string;
+  status: OrderStatus;
   total: number;
   items: Array<{
     name: string;

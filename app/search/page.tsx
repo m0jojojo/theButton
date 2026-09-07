@@ -18,7 +18,12 @@ function SearchResultsContent() {
 
   const [results, setResults] = useState<Product[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>(sortParam as SortOption);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<{
+    collection?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    inStock?: boolean;
+  }>({
     collection: collectionFilter,
     minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
     maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,

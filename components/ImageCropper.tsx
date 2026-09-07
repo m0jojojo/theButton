@@ -276,11 +276,6 @@ export default function ImageCropper({
                 overflow: 'hidden'
               }}
             >
-              {console.log('[ImageCropper] Rendering Cropper with image:', { 
-                imageLength: image.length, 
-                isDataUrl: image.startsWith('data:'),
-                preview: image.substring(0, 80) + '...'
-              })}
               <Cropper
                 image={image}
                 crop={crop}

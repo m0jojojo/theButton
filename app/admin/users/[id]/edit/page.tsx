@@ -305,7 +305,7 @@ export default function EditUserPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
                     />
                     <p className="mt-1 text-sm text-gray-500">
-                      Leave blank if you don't want to change the password
+                      Leave blank if you don&apos;t want to change the password
                     </p>
                   </div>
 

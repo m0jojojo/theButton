@@ -1,6 +1,8 @@
 // Mock review store - Replace with database in production
 // This is a temporary solution for MVP
 
+export type ReviewStatus = 'approved' | 'pending' | 'rejected';
+
 export interface Review {
   id: string;
   productId: string;
@@ -13,7 +15,7 @@ export interface Review {
   helpfulCount: number; // Number of helpful votes
   createdAt: Date;
   updatedAt: Date;
-  status: 'approved' | 'pending' | 'rejected'; // For moderation
+  status: ReviewStatus; // For moderation
 }
 
 export interface ReviewVote {
@@ -55,7 +57,7 @@ import { getOrdersByUserEmail } from './orders';
 
 export async function hasUserPurchasedProduct(userEmail: string, productId: string): Promise<boolean> {
   try {
-    const orders = getOrdersByUserEmail(userEmail);
+    const orders = await getOrdersByUserEmail(userEmail);
     return orders.some((order) =>
       order.items.some((item) => item.productId === productId)
     );
