@@ -6,6 +6,7 @@ import CategoryCarousel from '@/components/CategoryCarousel';
 import { shopCategories } from '@/lib/categories';
 import ProductCarousel from '@/components/ProductCarousel';
 import TrustHighlights from '@/components/TrustHighlights';
+import Testimonials from '@/components/Testimonials';
 import { getAllProductsFromDB } from '@/lib/products-db';
 
 export default async function Home() {
@@ -94,6 +95,8 @@ export default async function Home() {
       </section>
 
       <TrustHighlights />
+
+      <Testimonials />
 
       {/* CTA Section */}
       <section className="py-12 md:py-16 bg-gray-900 text-white">
