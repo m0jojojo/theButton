@@ -111,6 +111,8 @@ model Order {
   status         OrderStatus   @default(pending)
   paymentMethod  PaymentMethod @map("payment_method")
   paymentStatus  PaymentStatus @default(pending) @map("payment_status")
+  razorpayOrderId   String?    @unique @map("razorpay_order_id")
+  razorpayPaymentId String?    @map("razorpay_payment_id")
   subtotal       Decimal       @db.Decimal(10, 2)
   shipping       Decimal       @db.Decimal(10, 2)
   total          Decimal       @db.Decimal(10, 2)

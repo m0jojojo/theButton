@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { initiateRazorpayPayment, createRazorpayOrder } from '@/lib/razorpay';
+import { initiateRazorpayPayment, createRazorpayOrder, verifyRazorpayPayment } from '@/lib/razorpay';
 import { useAuth } from '@/contexts/AuthContext';
 import { CartItem } from '@/contexts/CartContext';
 
@@ -144,7 +144,7 @@ export default function CheckoutForm({
       const orderData = {
         orderId,
         paymentMethod: formData.paymentMethod,
-        paymentStatus: formData.paymentMethod === 'cod' ? 'pending' : 'paid',
+        paymentStatus: 'pending',
         items: items.map((item) => ({
           id: item.id,
           productId: item.productId,
@@ -218,26 +218,35 @@ export default function CheckoutForm({
 
       if (formData.paymentMethod === 'razorpay') {
         try {
-          // Create Razorpay order
-          const razorpayOrderId = await createRazorpayOrder(total * 100, {
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
-          });
+          // The server prices the cart and opens the Razorpay order; the
+          // amount is never taken from the browser.
+          const created = await createRazorpayOrder(
+            items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+            })),
+            orderId
+          );
 
-          // Initiate Razorpay payment
           await initiateRazorpayPayment({
-            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
-            amount: total * 100, // Convert to paise
-            currency: 'INR',
+            key: created.keyId,
+            amount: created.amount,
+            currency: created.currency,
             name: 'Rangrez',
             description: `Order ${orderId}`,
-            order_id: razorpayOrderId,
-            handler: (response) => {
-              // Payment successful
-              console.log('Payment successful:', response);
-              onOrderSuccess(orderId, formData.phone);
+            order_id: created.razorpayOrderId,
+            handler: async (response) => {
+              try {
+                // Only the server can tell a real payment from a forged one.
+                await verifyRazorpayPayment(response, orderId);
+                onOrderSuccess(orderId, formData.phone);
+              } catch (error) {
+                console.error('Verification error:', error);
+                alert(
+                  'We could not confirm your payment. If money was debited, contact us on WhatsApp and we will sort it out.'
+                );
+                setIsProcessing(false);
+              }
             },
             prefill: {
               name: `${formData.firstName} ${formData.lastName}`,
@@ -248,9 +257,9 @@ export default function CheckoutForm({
               color: '#000000',
             },
           });
-        } catch (error) {
+        } catch (error: any) {
           console.error('Payment error:', error);
-          alert('Payment failed. Please try again or use Cash on Delivery.');
+          alert(error?.message || 'Payment failed. Please try again or use Cash on Delivery.');
           setIsProcessing(false);
         }
       } else {

@@ -1,5 +1,8 @@
-// Razorpay integration utilities
-// This will be fully implemented when Razorpay keys are provided
+// Razorpay checkout helpers (browser side).
+//
+// Order creation and payment verification both happen on the server - see
+// app/api/razorpay/* - because they need the key secret and must price the
+// cart from the database rather than from whatever the browser reports.
 
 export interface RazorpayOptions {
   key: string;
@@ -47,19 +50,49 @@ export const loadRazorpayScript = (): Promise<void> => {
   });
 };
 
+export interface CreatedRazorpayOrder {
+  razorpayOrderId: string;
+  amount: number; // paise
+  currency: string;
+  keyId: string;
+}
+
+/** Asks the server to open a Razorpay order for the given cart. */
 export const createRazorpayOrder = async (
-  amount: number,
-  orderData: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
+  items: Array<{ productId: string; quantity: number }>,
+  orderId?: string
+): Promise<CreatedRazorpayOrder> => {
+  const response = await fetch('/api/razorpay/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items, orderId }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || 'Could not start the payment');
   }
-): Promise<string> => {
-  // This would typically call your backend API to create an order
-  // For now, returning a mock order ID
-  // In production, this should be: POST /api/razorpay/create-order
-  return Promise.resolve(`order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  return data;
+};
+
+/**
+ * Hands the checkout callback to the server, which checks the signature before
+ * marking anything paid. A payment is only real once this resolves.
+ */
+export const verifyRazorpayPayment = async (
+  response: RazorpayResponse,
+  orderId?: string
+): Promise<void> => {
+  const result = await fetch('/api/razorpay/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...response, orderId }),
+  });
+
+  const data = await result.json().catch(() => ({}));
+  if (!result.ok || !data.verified) {
+    throw new Error(data.error || 'Payment could not be verified');
+  }
 };
 
 export const initiateRazorpayPayment = async (
