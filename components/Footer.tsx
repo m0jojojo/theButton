@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { contact, mailHref, telHref, whatsappHref } from '@/lib/contact';
 
 const footerLinks = {
   shop: [
@@ -33,7 +34,7 @@ export default function Footer() {
             </p>
             {/* WhatsApp CTA - will be enhanced in Phase 3 */}
             <a
-              href="https://wa.me/919876543210"
+              href={whatsappHref()}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 text-sm font-medium text-green-400 hover:text-green-300 transition-colors"
@@ -103,6 +104,30 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="col-span-2 md:col-span-4">
+            <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+              Contact
+            </h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                Email:{' '}
+                <a href={mailHref} className="hover:text-white transition-colors">
+                  {contact.email}
+                </a>
+              </li>
+              <li>
+                Phone:{' '}
+                <a href={telHref} className="hover:text-white transition-colors">
+                  {contact.phone}
+                </a>
+              </li>
+              <li className="not-italic">
+                {contact.address.line1}, {contact.address.line2}
+              </li>
             </ul>
           </div>
         </div>

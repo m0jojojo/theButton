@@ -1,3 +1,5 @@
+import { whatsappHref } from '@/lib/contact';
+
 export const metadata = {
   title: 'Contact Us',
   description: 'Get in touch with Rangrez',
@@ -22,7 +24,7 @@ export default function ContactPage() {
             The fastest way to reach us! Chat with us on WhatsApp for instant support.
           </p>
           <a
-            href="https://wa.me/919876543210"
+            href={whatsappHref()}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center space-x-2 px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors"

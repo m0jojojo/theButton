@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { trackPurchase, trackWhatsAppClick } from '@/lib/analytics';
+import { whatsappHref } from '@/lib/contact';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -51,7 +52,7 @@ function OrderSuccessContent() {
     `Hi! I just placed an order.\n\nOrder ID: ${orderId || 'N/A'}\n\nCan you confirm the order details and estimated delivery time?`
   );
 
-  const whatsappUrl = `https://wa.me/919876543210?text=${whatsappMessage}`;
+  const whatsappUrl = `${whatsappHref()}?text=${whatsappMessage}`;
 
   const handleWhatsAppClick = () => {
     trackWhatsAppClick({

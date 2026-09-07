@@ -9,11 +9,8 @@ interface CategoryCarouselProps {
   images: Record<string, string | undefined>;
 }
 
-const AUTO_ADVANCE_MS = 3000;
-
 export default function CategoryCarousel({ categories, images }: CategoryCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
@@ -51,39 +48,15 @@ export default function CategoryCarousel({ categories, images }: CategoryCarouse
     return () => window.removeEventListener('resize', updateArrows);
   }, [updateArrows]);
 
-  // Drift one card at a time, looping back to the start at the end.
-  useEffect(() => {
-    if (paused || categories.length < 2) return;
-
-    const timer = setInterval(() => {
-      const track = trackRef.current;
-      if (!track) return;
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (track.scrollLeft >= maxScroll - 1) {
-        track.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        track.scrollBy({ left: getStep(), behavior: 'smooth' });
-      }
-    }, AUTO_ADVANCE_MS);
-
-    return () => clearInterval(timer);
-  }, [paused, categories.length, getStep]);
-
   if (categories.length === 0) return null;
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={() => setPaused(false)}
-    >
+    <div className="relative">
       <button
         type="button"
         onClick={() => scrollByCards(-1)}
         aria-label="Previous categories"
-        className={`absolute left-0 top-[38%] md:top-[42%] z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-gray-200 transition hover:bg-gray-50 ${
+        className={`absolute left-0 top-[38%] md:top-[42%] z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-gray-600 shadow-md ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-white ${
           atStart ? 'opacity-40' : ''
         }`}
       >
@@ -96,7 +69,7 @@ export default function CategoryCarousel({ categories, images }: CategoryCarouse
         type="button"
         onClick={() => scrollByCards(1)}
         aria-label="Next categories"
-        className={`absolute right-0 top-[38%] md:top-[42%] z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-gray-200 transition hover:bg-gray-50 ${
+        className={`absolute right-0 top-[38%] md:top-[42%] z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-gray-600 shadow-md ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-white ${
           atEnd ? 'opacity-40' : ''
         }`}
       >
@@ -108,7 +81,7 @@ export default function CategoryCarousel({ categories, images }: CategoryCarouse
       <div
         ref={trackRef}
         onScroll={updateArrows}
-        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth scroll-px-12 px-12 md:gap-8 md:scroll-px-14 md:px-14"
+        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth md:gap-8"
       >
         {categories.map((category) => {
           const image = images[category.slug];
@@ -116,7 +89,7 @@ export default function CategoryCarousel({ categories, images }: CategoryCarouse
             <Link
               key={category.slug}
               href={`/collections/${category.slug}`}
-              className="group w-[calc((100%-2rem)/3)] flex-shrink-0 snap-start text-center md:w-[calc((100%-4rem)/3)]"
+              className="group w-[28%] flex-shrink-0 snap-start text-center md:w-[calc((100%-4rem)/3)]"
             >
               <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 transition group-hover:ring-gray-400">
                 {image ? (

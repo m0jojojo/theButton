@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Analytics from "@/components/Analytics";
@@ -105,6 +106,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <WhatsAppButton />
             </CartProvider>
           </AuthProvider>
         </ErrorBoundaryWrapper>

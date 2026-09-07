@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { trackWhatsAppClick } from '@/lib/analytics';
+import { whatsappHref } from '@/lib/contact';
 
 interface StickyWhatsAppProps {
   product: {
@@ -40,7 +41,7 @@ export default function StickyWhatsApp({ product }: StickyWhatsAppProps) {
     `Hi! I'm interested in:\n\n${product.name}\nPrice: ${formatPrice(product.price)}\n\nCan you help me with more details?`
   );
 
-  const whatsappUrl = `https://wa.me/919876543210?text=${whatsappMessage}`;
+  const whatsappUrl = `${whatsappHref()}?text=${whatsappMessage}`;
 
   const handleWhatsAppClick = () => {
     trackWhatsAppClick({

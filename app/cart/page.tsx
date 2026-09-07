@@ -7,6 +7,7 @@ import FreeShippingProgress from '@/components/FreeShippingProgress';
 import CartItem from '@/components/CartItem';
 import CartUpsells from '@/components/CartUpsells';
 import TrustBadges from '@/components/TrustBadges';
+import { whatsappHref } from '@/lib/contact';
 
 export default function CartPage() {
   const { items, getTotal, getItemCount, clearCart } = useCart();
@@ -144,9 +145,9 @@ export default function CartPage() {
 
               {/* WhatsApp Checkout Option */}
               <a
-                href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                href={whatsappHref(
                   `Hi! I'd like to place an order:\n\n${items.map(item => `${item.name} (Size: ${item.size}) x${item.quantity} - ${formatPrice(item.price * item.quantity)}`).join('\n')}\n\nTotal: ${formatPrice(total)}`
-                )}`}
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full py-3 px-6 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors text-center flex items-center justify-center gap-2"
