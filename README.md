@@ -115,7 +115,7 @@ Create a `.env.local` file:
 
 ```env
 # Site Configuration
-NEXT_PUBLIC_SITE_URL=https://rangrez.in
+NEXT_PUBLIC_SITE_URL=https://rangrez.club
 
 # Analytics (Optional)
 NEXT_PUBLIC_META_PIXEL_ID=your_meta_pixel_id

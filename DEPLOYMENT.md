@@ -12,7 +12,7 @@
 ## Environment Variables
 
 ### Required
-- `NEXT_PUBLIC_SITE_URL` - Your production site URL (e.g., `https://rangrez.in`)
+- `NEXT_PUBLIC_SITE_URL` - Your production site URL (e.g., `https://rangrez.club`)
 
 ### Optional (but recommended)
 - `NEXT_PUBLIC_META_PIXEL_ID` - Facebook Pixel ID for tracking
@@ -52,7 +52,7 @@
 
 **Custom Domain:**
 - Go to Project Settings → Domains
-- Add your custom domain (e.g., `rangrez.in`)
+- Add your custom domain (e.g., `rangrez.club`)
 - Follow DNS configuration instructions
 
 ### Option 2: Netlify

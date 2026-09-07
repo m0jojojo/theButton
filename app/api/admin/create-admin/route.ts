@@ -2,12 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createUser, getUserByEmail, getAllUsers } from '@/lib/users';
 import { signToken } from '@/lib/jwt';
 
+/**
+ * Bootstrap-only endpoint. Both handlers create an administrator without any
+ * authentication, so they must stop working the moment one exists - otherwise
+ * anyone who finds this URL can grant themselves admin access.
+ */
+async function adminAlreadyExists(): Promise<boolean> {
+  const allUsers = await getAllUsers();
+  return allUsers.some((user) => user.role === 'admin');
+}
+
 // Default admin credentials (change in production!)
 const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@rangrez.com';
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
 
 export async function POST(request: NextRequest) {
   try {
+    if (await adminAlreadyExists()) {
+      return NextResponse.json(
+        { error: 'An administrator already exists. Sign in and create further admins from the admin area.' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { email, password, name } = body;
 
@@ -69,8 +86,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Check if any admin users exist
-    const allUsers = await getAllUsers();
-    const hasAdmin = allUsers.some((user) => user.role === 'admin');
+    const hasAdmin = await adminAlreadyExists();
 
     if (hasAdmin) {
       return NextResponse.json(
