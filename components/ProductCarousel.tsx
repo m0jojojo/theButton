@@ -97,7 +97,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
           type="button"
           onClick={() => scrollByCards(-1)}
           aria-label="Previous products"
-          className={`absolute left-0 top-[30%] z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-gray-200 transition hover:bg-gray-50 ${
+          className={`absolute left-0 top-[30%] z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-gray-600 shadow-md ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-white ${
             atStart ? 'opacity-40' : ''
           }`}
         >
@@ -110,7 +110,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
           type="button"
           onClick={() => scrollByCards(1)}
           aria-label="Next products"
-          className={`absolute right-0 top-[30%] z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-gray-200 transition hover:bg-gray-50 ${
+          className={`absolute right-0 top-[30%] z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-gray-600 shadow-md ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-white ${
             atEnd ? 'opacity-40' : ''
           }`}
         >
@@ -122,7 +122,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
         <div
           ref={trackRef}
           onScroll={updateArrows}
-          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth scroll-px-12 px-12 md:gap-6 md:scroll-px-14 md:px-14"
+          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth md:gap-6"
         >
           {products.map((product) => {
             const image = product.images?.[0];
@@ -135,7 +135,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
             return (
               <div
                 key={product.id}
-                className="w-[calc((100%-1rem)/2)] flex-shrink-0 snap-start md:w-[calc((100%-4.5rem)/4)]"
+                className="w-[46%] flex-shrink-0 snap-start md:w-[calc((100%-4.5rem)/4)]"
               >
                 <div className="group relative">
                   <Link href={`/products/${product.id}`} className="block">
