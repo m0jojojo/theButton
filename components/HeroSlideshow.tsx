@@ -50,6 +50,11 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
           <img
             src={slide}
             alt={`Slide ${index + 1} of ${slides.length}`}
+            width={1200}
+            height={1200}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+            decoding="async"
             className="w-full h-full object-cover"
           />
         </div>

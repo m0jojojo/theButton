@@ -5,6 +5,7 @@ import HeroSlideshow from '@/components/HeroSlideshow';
 import CategoryCarousel from '@/components/CategoryCarousel';
 import { shopCategories } from '@/lib/categories';
 import ProductCarousel from '@/components/ProductCarousel';
+import TrustHighlights from '@/components/TrustHighlights';
 import { getAllProductsFromDB } from '@/lib/products-db';
 
 export default async function Home() {
@@ -17,6 +18,16 @@ export default async function Home() {
     product.collection?.toLowerCase().includes('saree')
   );
   const featuredSarees = (sareeProducts.length > 0 ? sareeProducts : allProducts).slice(0, 12);
+
+  // getAllProductsFromDB returns newest first.
+  const newArrivals = allProducts.slice(0, 12);
+
+  const suitProducts = allProducts.filter((product) =>
+    product.collection?.toLowerCase().includes('suit')
+  );
+  const featuredSuits = (suitProducts.length > 0 ? suitProducts : allProducts).slice(0, 12);
+
+  const shopAll = allProducts.slice(0, 12);
   
   // Fall back to the legacy single banner so an existing upload still shows.
   const heroSlides =
@@ -35,7 +46,7 @@ export default async function Home() {
       {/* Featured Collections */}
       <section className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
             Shop by Category
           </h2>
           <CategoryCarousel categories={shopCategories} images={collectionImages} />
@@ -45,51 +56,49 @@ export default async function Home() {
       {/* Saree Collection */}
       <section className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
             Saree Collection
           </h2>
           <ProductCarousel products={featuredSarees} viewAllHref="/search?q=saree" />
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-12 md:py-16 lg:py-20 bg-gray-50">
+      {/* New Arrivals */}
+      <section className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
-            Why Choose Rangrez?
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+            New Arrivals
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            {[
-              {
-                title: 'Premium Quality',
-                description: 'Carefully curated fabrics and craftsmanship that lasts.',
-                icon: '✨',
-              },
-              {
-                title: 'Fast Delivery',
-                description: 'Quick shipping across India with easy returns.',
-                icon: '🚚',
-              },
-              {
-                title: 'WhatsApp Support',
-                description: 'Chat with us anytime for style advice and support.',
-                icon: '💬',
-              },
-            ].map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            ))}
-          </div>
+          <ProductCarousel products={newArrivals} viewAllHref="/collections/new-arrivals" />
         </div>
       </section>
+
+      {/* Suits Collection */}
+      <section className="py-12 md:py-16 lg:py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+            Suits Collection
+          </h2>
+          <ProductCarousel products={featuredSuits} viewAllHref="/search?q=suit" />
+        </div>
+      </section>
+
+      {/* Shop All */}
+      <section className="py-12 md:py-16 lg:py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+            Shop All
+          </h2>
+          <ProductCarousel products={shopAll} viewAllHref="/products" />
+        </div>
+      </section>
+
+      <TrustHighlights />
 
       {/* CTA Section */}
       <section className="py-12 md:py-16 bg-gray-900 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Elevate Your Style?
           </h2>
           <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">

@@ -10,6 +10,7 @@ interface ProductCarouselProps {
 }
 
 const WISHLIST_KEY = 'rangrez_wishlist';
+const WISHLIST_EVENT = 'rangrez-wishlist-change';
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat('en-IN', {
@@ -25,6 +26,8 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
   const [wishlist, setWishlist] = useState<string[]>([]);
 
   // Saved items live in this browser only - there is no wishlist API yet.
+  // The page renders more than one carousel and a product can appear in both,
+  // so instances broadcast changes to keep their hearts in sync.
   useEffect(() => {
     try {
       const stored = localStorage.getItem(WISHLIST_KEY);
@@ -32,6 +35,12 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
     } catch {
       // Ignore unreadable storage (private mode, cleared site data).
     }
+
+    const onChange = (event: Event) => {
+      setWishlist((event as CustomEvent<string[]>).detail);
+    };
+    window.addEventListener(WISHLIST_EVENT, onChange);
+    return () => window.removeEventListener(WISHLIST_EVENT, onChange);
   }, []);
 
   const toggleWishlist = (productId: string) => {
@@ -44,6 +53,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
       } catch {
         // Ignore write failures; the toggle still works for this page view.
       }
+      window.dispatchEvent(new CustomEvent(WISHLIST_EVENT, { detail: next }));
       return next;
     });
   };
@@ -137,6 +147,10 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
                         <img
                           src={image}
                           alt={product.name}
+                          width={200}
+                          height={267}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />
                       ) : (
@@ -171,7 +185,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
                 </div>
 
                 <Link href={`/products/${product.id}`} className="block">
-                  <h3 className="mt-3 font-serif text-sm leading-snug text-[#7b1f2b] line-clamp-2">
+                  <h3 className="mt-3 text-sm leading-snug text-[#7b1f2b] line-clamp-2">
                     {product.name}
                   </h3>
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">

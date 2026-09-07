@@ -126,6 +126,10 @@ export default function CategoryCarousel({ categories, images }: CategoryCarouse
                   <img
                     src={image}
                     alt={category.name}
+                    width={300}
+                    height={300}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 ) : (
@@ -134,7 +138,7 @@ export default function CategoryCarousel({ categories, images }: CategoryCarouse
                   </div>
                 )}
               </div>
-              <h3 className="mt-4 font-serif text-xs uppercase leading-tight tracking-wide text-[#7b1f2b] sm:text-sm">
+              <h3 className="mt-4 text-xs uppercase leading-tight tracking-wide text-[#7b1f2b] sm:text-sm">
                 {category.name}
               </h3>
             </Link>

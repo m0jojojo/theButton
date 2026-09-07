@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -15,17 +15,10 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-const inter = Inter({ 
+const dmSans = DM_Sans({
   subsets: ["latin"],
   display: 'swap',
-  variable: '--font-inter',
-});
-
-// Serif display face used for section headings.
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  display: 'swap',
-  variable: '--font-serif',
+  variable: '--font-dm-sans',
 });
 
 export const metadata: Metadata = {
@@ -94,7 +87,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en" className={dmSans.variable}>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -102,7 +95,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta name="theme-color" content="#ffffff" />
       </head>
-      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
+      <body className={`${dmSans.className} antialiased`} suppressHydrationWarning>
         <Analytics />
         <ErrorBoundaryWrapper>
           <AuthProvider>
