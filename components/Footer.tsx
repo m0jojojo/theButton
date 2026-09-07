@@ -29,7 +29,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-2xl font-bold text-white mb-4">Rangrez</h3>
             <p className="text-sm mb-4">
-              Premium menswear from Rewari. Quality fashion for the modern man.
+              Hand block printed sarees and suits from Rewari. Quality fashion for the modern woman.
             </p>
             {/* WhatsApp CTA - will be enhanced in Phase 3 */}
             <a

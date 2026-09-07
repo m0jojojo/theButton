@@ -23,11 +23,11 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Rangrez | Premium Menswear | Rewari",
+    default: "Rangrez | Premium Women's Wear | Rewari",
     template: "%s | Rangrez"
   },
-  description: "Premium menswear collection from Rangrez, Rewari. Shop the latest trends in men's fashion with fast delivery and easy returns.",
-  keywords: ["menswear", "men's fashion", "clothing", "Rewari", "Rangrez", "fashion"],
+  description: "Hand block printed sarees and suits from Rangrez, Rewari. Chanderi and Maheshwari silks, cotton suit sets and more, with fast delivery and easy returns.",
+  keywords: ["sarees", "salwar suits", "hand block print", "women's wear", "Chanderi silk", "Maheshwari silk", "kurtis", "lehengas", "Rewari", "Rangrez"],
   authors: [{ name: "Rangrez" }],
   creator: "Rangrez",
   publisher: "Rangrez",
@@ -45,21 +45,21 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: '/',
     siteName: 'Rangrez',
-    title: 'Rangrez | Premium Menswear | Rewari',
-    description: 'Premium menswear collection from Rangrez, Rewari. Shop the latest trends in men\'s fashion.',
+    title: "Rangrez | Premium Women's Wear | Rewari",
+    description: "Hand block printed sarees and suits from Rangrez, Rewari. Chanderi and Maheshwari silks, cotton suit sets and more.",
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Rangrez - Premium Menswear',
+        alt: "Rangrez - Premium Women's Wear",
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rangrez | Premium Menswear | Rewari',
-    description: 'Premium menswear collection from Rangrez, Rewari.',
+    title: "Rangrez | Premium Women's Wear | Rewari",
+    description: "Hand block printed sarees and suits from Rangrez, Rewari.",
     images: ['/og-image.jpg'],
   },
   robots: {

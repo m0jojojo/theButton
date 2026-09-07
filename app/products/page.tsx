@@ -23,7 +23,7 @@ export default async function AllProductsPage() {
           All Products
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl">
-          Browse our complete collection of premium menswear
+          Browse our complete collection of premium women&apos;s wear
         </p>
       </div>
 

@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'About Us',
-  description: 'Learn about Rangrez - Premium menswear from Rewari',
+  description: "Learn about Rangrez - Premium women's wear from Rewari",
 };
 
 export default function AboutPage() {
@@ -13,7 +13,7 @@ export default function AboutPage() {
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Our Story</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
             Rangrez was born from a simple belief: every man deserves access to premium quality 
-            menswear that doesn&apos;t break the bank. Based in Rewari, we&apos;re passionate about bringing 
+            women&apos;s wear that doesn&apos;t break the bank. Based in Rewari, we&apos;re passionate about bringing 
             you carefully curated fashion that combines style, quality, and value.
           </p>
           <p className="text-gray-700 mb-4 leading-relaxed">
@@ -26,7 +26,7 @@ export default function AboutPage() {
         <section className="mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Our Mission</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            To make premium menswear accessible to everyone, without compromising on quality or style. 
+            To make premium women&apos;s wear accessible to everyone, without compromising on quality or style. 
             We&apos;re committed to providing exceptional customer service and building lasting relationships 
             with our customers.
           </p>
@@ -36,7 +36,7 @@ export default function AboutPage() {
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Why Choose Us?</h2>
           <ul className="list-disc list-inside text-gray-700 space-y-2">
             <li>Premium quality fabrics and craftsmanship</li>
-            <li>Curated collections for the modern man</li>
+            <li>Curated collections for the modern woman</li>
             <li>Fast and reliable delivery across India</li>
             <li>Easy returns and exchanges</li>
             <li>Personalized customer support via WhatsApp</li>
