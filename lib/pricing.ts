@@ -14,6 +14,18 @@ export const SHIPPING_FEE = 99;
 export interface CartLine {
   productId: string;
   quantity: number;
+  size?: string;
+}
+
+/** A cart line priced from the database, ready to store on an order. */
+export interface PricedLine {
+  productId: string;
+  name: string;
+  price: number;
+  compareAtPrice?: number;
+  size: string;
+  quantity: number;
+  image: string;
 }
 
 export interface PricedOrder {
@@ -22,6 +34,7 @@ export interface PricedOrder {
   total: number;
   /** Total in paise, the unit Razorpay works in. */
   amountInPaise: number;
+  items: PricedLine[];
 }
 
 export async function priceCart(lines: CartLine[]): Promise<PricedOrder> {
@@ -31,22 +44,37 @@ export async function priceCart(lines: CartLine[]): Promise<PricedOrder> {
 
   const products = await prisma.product.findMany({
     where: { id: { in: lines.map((line) => line.productId) } },
-    select: { id: true, price: true },
+    select: { id: true, name: true, price: true, compareAtPrice: true, images: true },
   });
 
-  const priceById = new Map(products.map((p) => [p.id, Number(p.price)]));
+  const byId = new Map(products.map((p) => [p.id, p]));
 
   let subtotal = 0;
+  const items: PricedLine[] = [];
+
   for (const line of lines) {
-    const price = priceById.get(line.productId);
-    if (price === undefined) {
+    const product = byId.get(line.productId);
+    if (!product) {
       throw new Error(`Unknown product: ${line.productId}`);
     }
     const quantity = Math.floor(Number(line.quantity));
     if (!Number.isFinite(quantity) || quantity < 1) {
       throw new Error(`Invalid quantity for product ${line.productId}`);
     }
+
+    const price = Number(product.price);
     subtotal += price * quantity;
+
+    const images = Array.isArray(product.images) ? (product.images as string[]) : [];
+    items.push({
+      productId: product.id,
+      name: product.name,
+      price,
+      compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
+      size: line.size || 'Free Size',
+      quantity,
+      image: images[0] ?? '',
+    });
   }
 
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
@@ -57,5 +85,6 @@ export async function priceCart(lines: CartLine[]): Promise<PricedOrder> {
     shipping,
     total,
     amountInPaise: Math.round(total * 100),
+    items,
   };
 }
