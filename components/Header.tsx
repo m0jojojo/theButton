@@ -17,6 +17,30 @@ const navLinks = [
   { name: 'Lehengas', href: '/collections/lehengas' },
 ];
 
+// RANGREZ has seven letters, so each takes one colour of VIBGYOR. The yellow is
+// darkened from pure #FFFF00, which is close to invisible on a white header.
+const WORDMARK: Array<[string, string]> = [
+  ['R', '#8F00FF'], // violet
+  ['A', '#4B0082'], // indigo
+  ['N', '#0057E7'], // blue
+  ['G', '#00A550'], // green
+  ['R', '#E8B400'], // yellow
+  ['E', '#FF7F00'], // orange
+  ['Z', '#E01B24'], // red
+];
+
+function Wordmark() {
+  return (
+    <span aria-label="Rangrez">
+      {WORDMARK.map(([letter, colour], index) => (
+        <span key={index} style={{ color: colour }} aria-hidden="true">
+          {letter}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -82,7 +106,7 @@ export default function Header() {
               href="/"
               className="hidden md:flex items-center gap-2 text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity text-gray-900"
             >
-              RANGREZ
+              <Wordmark />
             </Link>
           </div>
 
@@ -91,7 +115,7 @@ export default function Header() {
             href="/"
             className="md:hidden text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity text-gray-900"
           >
-            RANGREZ
+            <Wordmark />
           </Link>
 
           {/* Desktop Navigation */}

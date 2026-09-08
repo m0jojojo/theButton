@@ -63,7 +63,7 @@ const highlights: Highlight[] = [
 
 export default function TrustHighlights() {
   return (
-    <section className="bg-[#fdfaef] py-12 md:py-16">
+    <section className="bg-[#fdfaef] py-10 md:py-14">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
           {highlights.map((item) => (

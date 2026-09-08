@@ -50,9 +50,9 @@ export default async function Home() {
       <HeroSlideshow slides={heroSlides} />
 
       {/* Featured Collections */}
-      <section className="py-12 md:py-16 lg:py-20 bg-white">
+      <section className="py-6 md:py-10 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-6 md:mb-8">
             Shop by Category
           </h2>
           <CategoryCarousel categories={shopCategories} images={collectionImages} />
@@ -60,9 +60,9 @@ export default async function Home() {
       </section>
 
       {/* Saree Collection */}
-      <section className="py-12 md:py-16 lg:py-20 bg-white">
+      <section className="py-6 md:py-10 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-6 md:mb-8">
             Saree Collection
           </h2>
           <ProductCarousel products={featuredSarees} viewAllHref="/search?q=saree" />
@@ -70,9 +70,9 @@ export default async function Home() {
       </section>
 
       {/* New Arrivals */}
-      <section className="py-12 md:py-16 lg:py-20 bg-white">
+      <section className="py-6 md:py-10 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-6 md:mb-8">
             New Arrivals
           </h2>
           <ProductCarousel products={newArrivals} viewAllHref="/collections/new-arrivals" />
@@ -80,9 +80,9 @@ export default async function Home() {
       </section>
 
       {/* Suits Collection */}
-      <section className="py-12 md:py-16 lg:py-20 bg-white">
+      <section className="py-6 md:py-10 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-6 md:mb-8">
             Suits Collection
           </h2>
           <ProductCarousel products={featuredSuits} viewAllHref="/search?q=suit" />
@@ -90,9 +90,9 @@ export default async function Home() {
       </section>
 
       {/* Shop All */}
-      <section className="py-12 md:py-16 lg:py-20 bg-white">
+      <section className="py-6 md:py-10 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-black mb-6 md:mb-8">
             Shop All
           </h2>
           <ProductCarousel products={shopAll} viewAllHref="/products" />
@@ -104,7 +104,7 @@ export default async function Home() {
       <Testimonials />
 
       {/* CTA Section */}
-      <section className="py-12 md:py-16 bg-gray-900 text-white">
+      <section className="py-10 md:py-14 bg-gray-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Elevate Your Style?

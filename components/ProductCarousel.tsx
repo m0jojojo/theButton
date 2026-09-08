@@ -210,7 +210,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
         </div>
       </div>
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-6 flex justify-center">
         <Link
           href={viewAllHref}
           className="inline-flex items-center gap-2 border border-gray-300 px-8 py-3 text-sm font-medium uppercase tracking-wide text-gray-900 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"

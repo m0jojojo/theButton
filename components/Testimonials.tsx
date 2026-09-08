@@ -88,7 +88,7 @@ export default function Testimonials() {
 
   return (
     <section
-      className="bg-[#f8f9fc] py-14 md:py-20"
+      className="bg-[#f8f9fc] py-10 md:py-14"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -109,7 +109,7 @@ export default function Testimonials() {
           Hear from our cherished patrons about their experience with Rangrez.
         </p>
 
-        <div className="relative mx-auto mt-10 max-w-2xl">
+        <div className="relative mx-auto mt-8 max-w-2xl">
           <button
             type="button"
             onClick={() => go(-1)}
