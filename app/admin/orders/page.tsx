@@ -71,34 +71,34 @@ export default function AdminOrdersPage() {
         {/* Navigation */}
         <nav className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4">
-            <div className="flex space-x-6">
+            <div className="no-scrollbar -mx-4 flex space-x-6 overflow-x-auto px-4">
               <Link
                 href="/admin/dashboard"
-                className="py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
+                className="flex-none whitespace-nowrap py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
               >
                 Dashboard
               </Link>
               <Link
                 href="/admin/products"
-                className="py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
+                className="flex-none whitespace-nowrap py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
               >
                 Products
               </Link>
               <Link
                 href="/admin/orders"
-                className="py-4 px-2 border-b-2 border-gray-900 text-gray-900 font-medium"
+                className="flex-none whitespace-nowrap py-4 px-2 border-b-2 border-gray-900 text-gray-900 font-medium"
               >
                 Orders
               </Link>
               <Link
                 href="/admin/users"
-                className="py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
+                className="flex-none whitespace-nowrap py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
               >
                 Users
               </Link>
               <Link
                 href="/admin/reviews"
-                className="py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
+                className="flex-none whitespace-nowrap py-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
               >
                 Reviews
               </Link>
