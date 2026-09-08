@@ -9,6 +9,11 @@ import TrustHighlights from '@/components/TrustHighlights';
 import Testimonials from '@/components/Testimonials';
 import { getAllProductsFromDB } from '@/lib/products-db';
 
+// These pages read products and homepage settings from the database. Without
+// this they are prerendered once at build time, so catalogue and image changes
+// only appear after a redeploy. Re-render at most once a minute instead.
+export const revalidate = 60;
+
 export default async function Home() {
   const settings = await getHomepageSettingsFromDB();
   const allProducts = await getAllProductsFromDB();

@@ -3,6 +3,11 @@ import Image from 'next/image';
 import { getAllProductsFromDB } from '@/lib/products-db';
 import ProductReviewStars from '@/components/ProductReviewStars';
 
+// These pages read products and homepage settings from the database. Without
+// this they are prerendered once at build time, so catalogue and image changes
+// only appear after a redeploy. Re-render at most once a minute instead.
+export const revalidate = 60;
+
 export default async function AllProductsPage() {
   // Fetch all products from database
   const products = await getAllProductsFromDB();

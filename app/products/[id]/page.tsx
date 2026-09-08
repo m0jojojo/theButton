@@ -6,6 +6,11 @@ import ProductViewTracker from '@/components/ProductViewTracker';
 import ProductReviews from '@/components/ProductReviews';
 import { getProductByIdFromDB, getAllProductIdsFromDB } from '@/lib/products-db';
 
+// These pages read products and homepage settings from the database. Without
+// this they are prerendered once at build time, so catalogue and image changes
+// only appear after a redeploy. Re-render at most once a minute instead.
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   // Phase 4: Get product IDs from database
   const productIds = await getAllProductIdsFromDB();

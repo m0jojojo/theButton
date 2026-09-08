@@ -5,6 +5,11 @@ import { getProductsByCollectionFromDB } from '@/lib/products-db';
 import ProductReviewStars from '@/components/ProductReviewStars';
 import { shopCategories } from '@/lib/categories';
 
+// These pages read products and homepage settings from the database. Without
+// this they are prerendered once at build time, so catalogue and image changes
+// only appear after a redeploy. Re-render at most once a minute instead.
+export const revalidate = 60;
+
 const collectionInfo: Record<string, { name: string; description: string }> = {
   ...Object.fromEntries(
     shopCategories.map((category) => [

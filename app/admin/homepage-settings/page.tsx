@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import Link from 'next/link';
 import ImageCropper from '@/components/ImageCropper';
 import { shopCategories } from '@/lib/categories';
+import { uploadImageToCdn } from '@/lib/upload-client';
 
 interface HomepageSettings {
   id: string;
@@ -31,6 +32,7 @@ export default function HomepageSettingsPage() {
   });
 
   const [imageToCrop, setImageToCrop] = useState<{ type: string; data: string } | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -110,12 +112,24 @@ export default function HomepageSettingsPage() {
     }
   };
 
-  const handleCropComplete = (croppedImage: string, type: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [type]: croppedImage,
-    }));
+  const handleCropComplete = async (croppedImage: string, type: string) => {
     setImageToCrop(null);
+    setError('');
+    setIsUploading(true);
+
+    try {
+      // Store the CDN URL rather than the image itself: base64 in the database
+      // ends up inlined into every page's HTML.
+      const url = await uploadImageToCdn(croppedImage, {
+        fileName: `${type}-${Date.now()}`,
+        folder: type.startsWith('heroSlide') ? 'hero' : 'collections',
+      });
+      setFormData((prev) => ({ ...prev, [type]: url }));
+    } catch (err: any) {
+      setError(err.message || 'Image upload failed');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -8,6 +8,7 @@ import Link from 'next/link';
 import ImageCropper from '@/components/ImageCropper';
 import { Product } from '@/lib/products';
 import { shopCategories } from '@/lib/categories';
+import { uploadImageToCdn } from '@/lib/upload-client';
 
 export default function EditProductPage() {
   const params = useParams();
@@ -187,8 +188,16 @@ export default function EditProductPage() {
   };
 
   const handleCropComplete = (croppedImage: string) => {
-    setUploadedImages((prev) => [...prev, croppedImage]);
     setImageToCrop(null);
+
+    // Upload to the CDN and keep the URL: base64 images bloat every page that
+    // renders the product.
+    uploadImageToCdn(croppedImage, {
+      fileName: `product-${Date.now()}`,
+      folder: 'products',
+    })
+      .then((url) => setUploadedImages((prev) => [...prev, url]))
+      .catch((err) => setError(err.message || 'Image upload failed'));
     
     // Process next pending file if any
     if (pendingFiles.length > 0) {

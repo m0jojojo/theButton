@@ -6,6 +6,7 @@ import AdminGuard from '@/components/AdminGuard';
 import Link from 'next/link';
 import ImageCropper from '@/components/ImageCropper';
 import { shopCategories } from '@/lib/categories';
+import { uploadImageToCdn } from '@/lib/upload-client';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -167,8 +168,16 @@ export default function NewProductPage() {
   };
 
   const handleCropComplete = (croppedImage: string) => {
-    setUploadedImages((prev) => [...prev, croppedImage]);
     setImageToCrop(null);
+
+    // Upload to the CDN and keep the URL: base64 images bloat every page that
+    // renders the product.
+    uploadImageToCdn(croppedImage, {
+      fileName: `product-${Date.now()}`,
+      folder: 'products',
+    })
+      .then((url) => setUploadedImages((prev) => [...prev, url]))
+      .catch((err) => setError(err.message || 'Image upload failed'));
     
     // Process next pending file if any
     if (pendingFiles.length > 0) {
