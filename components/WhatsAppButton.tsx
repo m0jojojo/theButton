@@ -2,9 +2,6 @@ import { whatsappHref } from '@/lib/contact';
 
 /**
  * Floating WhatsApp button, shown on every page.
- *
- * Product pages also render StickyWhatsApp, which sits higher up the screen
- * and carries the product details in its message.
  */
 export default function WhatsAppButton() {
   return (

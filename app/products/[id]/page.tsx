@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import ImageGallery from '@/components/ImageGallery';
 import ProductInfo from '@/components/ProductInfo';
 import StickyAddToCart from '@/components/StickyAddToCart';
-import StickyWhatsApp from '@/components/StickyWhatsApp';
 import ProductViewTracker from '@/components/ProductViewTracker';
 import ProductReviews from '@/components/ProductReviews';
 import { getProductByIdFromDB, getAllProductIdsFromDB } from '@/lib/products-db';
@@ -53,7 +52,6 @@ export default async function ProductPage({
       <StickyAddToCart product={product} />
 
       {/* Sticky WhatsApp Button */}
-      <StickyWhatsApp product={product} />
     </>
   );
 }

@@ -40,6 +40,33 @@ function OrderSuccessContent() {
     }
   }, [orderId, items, getTotal, hasTracked]);
 
+  // The checkout save can fail (a dropped request, an expired token), so
+  // retry it here. This used to happen on the OTP screen.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const pendingOrder = sessionStorage.getItem('pending_order');
+    const token = localStorage.getItem('rangrez_token');
+    if (!pendingOrder || !token) return;
+
+    fetch('/api/orders/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(JSON.parse(pendingOrder)),
+    })
+      .then((response) => {
+        if (response.ok) {
+          sessionStorage.removeItem('pending_order');
+        }
+      })
+      .catch(() => {
+        // Leave it in sessionStorage so a later attempt can pick it up.
+      });
+  }, []);
+
   // Clear cart once after tracking is done
   useEffect(() => {
     if (hasTracked && !hasCleared) {

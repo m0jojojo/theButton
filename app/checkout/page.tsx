@@ -49,10 +49,9 @@ export default function CheckoutPage() {
     return null;
   }
 
-  const handleOrderSuccess = (orderId: string, phone: string) => {
+  const handleOrderSuccess = (orderId: string) => {
     setIsOrderComplete(true);
-    // Redirect to OTP verification page
-    router.replace(`/verify-otp?orderId=${orderId}&phone=${phone}`);
+    router.replace(`/order-success?orderId=${orderId}`);
   };
 
   return (

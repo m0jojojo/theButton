@@ -10,7 +10,7 @@ interface CheckoutFormProps {
   subtotal: number;
   shipping: number;
   items: CartItem[];
-  onOrderSuccess: (orderId: string, phone: string) => void;
+  onOrderSuccess: (orderId: string) => void;
   isProcessing: boolean;
   setIsProcessing: (processing: boolean) => void;
 }
@@ -239,7 +239,7 @@ export default function CheckoutForm({
               try {
                 // Only the server can tell a real payment from a forged one.
                 await verifyRazorpayPayment(response, orderId);
-                onOrderSuccess(orderId, formData.phone);
+                onOrderSuccess(orderId);
               } catch (error) {
                 console.error('Verification error:', error);
                 alert(
@@ -264,7 +264,7 @@ export default function CheckoutForm({
         }
       } else {
         // COD - redirect to OTP verification
-        onOrderSuccess(orderId, formData.phone);
+        onOrderSuccess(orderId);
       }
     } catch (error) {
       console.error('Order processing error:', error);
