@@ -53,7 +53,7 @@ export default async function AllProductsPage() {
                 href={`/products/${product.id}`}
                 className="group"
               >
-                <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-2 group-hover:shadow-lg transition-shadow">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-gray-100 mb-2 group-hover:shadow-lg transition-shadow">
                   {hasValidImage ? (
                     productImage.startsWith('data:') ? (
                       // Base64 data URL - use regular img tag

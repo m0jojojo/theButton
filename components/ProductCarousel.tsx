@@ -139,7 +139,7 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
               >
                 <div className="group relative">
                   <Link href={`/products/${product.id}`} className="block">
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-gray-100">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-gray-100">
                       {image ? (
                         // Images are base64 data URLs or remote URLs, so a plain
                         // img keeps both working without next/image host config.
@@ -147,8 +147,8 @@ export default function ProductCarousel({ products, viewAllHref }: ProductCarous
                         <img
                           src={image}
                           alt={product.name}
-                          width={200}
-                          height={267}
+                          width={400}
+                          height={500}
                           loading="lazy"
                           decoding="async"
                           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"

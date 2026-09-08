@@ -58,7 +58,7 @@ export default function CartUpsells() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="aspect-square bg-gray-200 rounded-lg mb-2" />
+              <div className="aspect-[4/5] bg-gray-200 rounded-lg mb-2" />
               <div className="h-3 bg-gray-200 rounded mb-1" />
               <div className="h-3 bg-gray-200 rounded w-2/3" />
             </div>
@@ -90,7 +90,7 @@ export default function CartUpsells() {
               href={`/products/${product.id}`}
               className="group"
             >
-              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-2 group-hover:shadow-md transition-shadow">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-gray-100 mb-2 group-hover:shadow-md transition-shadow">
                 {hasValidImage ? (
                   productImage.startsWith('data:') ? (
                     // Base64 data URL - use regular img tag

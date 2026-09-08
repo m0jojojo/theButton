@@ -93,7 +93,7 @@ export default async function CollectionPage({
                 className="group"
                 aria-label={`View ${product.name} - ${formatPrice(product.price)}`}
               >
-                <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 mb-3">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-gray-100 mb-3">
                   {productImage ? (
                     productImage.startsWith('data:') ? (
                       // Base64 data URL - use regular img tag

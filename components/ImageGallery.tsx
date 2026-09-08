@@ -37,7 +37,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 group cursor-zoom-in">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-gray-100 group cursor-zoom-in">
         {validImages[selectedImage] ? (
           validImages[selectedImage].startsWith('data:') ? (
             // Base64 data URL - use regular img tag
@@ -146,7 +146,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              className="relative max-w-4xl w-full aspect-square z-[10000]"
+              className="relative max-w-4xl w-full aspect-[4/5] z-[10000]"
               onClick={(e) => e.stopPropagation()}
             >
               {validImages[selectedImage] ? (
