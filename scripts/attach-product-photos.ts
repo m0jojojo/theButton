@@ -1,10 +1,10 @@
 /**
- * Attach real photographs to the suit products.
+ * Attach real photographs to products.
  *
- *   npx tsx scripts/attach-suit-photos.ts <folder> [--limit 12]
+ *   npx tsx scripts/attach-product-photos.ts <folder> --collection Saree [--limit 21]
  *
- * Uploads the first N images from the folder to ImageKit and sets one on each
- * suit product, in filename order. Existing images are replaced.
+ * Uploads images from the folder to ImageKit and sets one on each product whose
+ * collection matches, in filename order. Existing images are replaced.
  */
 
 import fs from 'fs';
@@ -23,11 +23,17 @@ const MIME: Record<string, string> = {
 
 async function main() {
   const folder = process.argv[2];
-  if (!folder) throw new Error('Usage: attach-suit-photos.ts <folder> [--limit N]');
+  if (!folder) {
+    throw new Error('Usage: attach-product-photos.ts <folder> --collection <match> [--limit N]');
+  }
   if (!isImageKitConfigured()) throw new Error('ImageKit is not configured.');
 
   const limitArg = process.argv.indexOf('--limit');
   const limit = limitArg > -1 ? Number(process.argv[limitArg + 1]) : Infinity;
+
+  const collectionArg = process.argv.indexOf('--collection');
+  const collection = collectionArg > -1 ? process.argv[collectionArg + 1] : undefined;
+  if (!collection) throw new Error('Pass --collection, e.g. --collection Saree');
 
   const files = fs
     .readdirSync(folder)
@@ -35,7 +41,7 @@ async function main() {
     .sort();
 
   const products = await prisma.product.findMany({
-    where: { collection: { contains: 'Suit' } },
+    where: { collection: { contains: collection } },
     select: { id: true, sku: true, name: true },
     orderBy: [{ collection: 'asc' }, { sku: 'asc' }],
   });
