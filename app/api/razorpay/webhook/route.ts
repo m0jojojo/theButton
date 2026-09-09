@@ -22,20 +22,26 @@ export async function POST(request: NextRequest) {
 
     const event = JSON.parse(rawBody);
 
-    if (event?.event === 'payment.captured') {
-      const payment = event.payload?.payment?.entity;
-      const razorpayOrderId: string | undefined = payment?.order_id;
-      const razorpayPaymentId: string | undefined = payment?.id;
+    const payment = event?.payload?.payment?.entity;
+    const razorpayOrderId: string | undefined = payment?.order_id;
+    const razorpayPaymentId: string | undefined = payment?.id;
 
-      if (razorpayOrderId && razorpayPaymentId) {
+    if (razorpayOrderId && razorpayPaymentId) {
+      if (event.event === 'payment.captured') {
         await prisma.order
           .update({
             where: { razorpayOrderId },
-            data: {
-              paymentStatus: 'paid',
-              status: 'confirmed',
-              razorpayPaymentId,
-            },
+            data: { paymentStatus: 'paid', status: 'confirmed', razorpayPaymentId },
+          })
+          .catch(() => {
+            console.warn('[razorpay/webhook] No order matched', razorpayOrderId);
+          });
+      } else if (event.event === 'payment.failed') {
+        // Record the failure so the order is not left pending forever.
+        await prisma.order
+          .update({
+            where: { razorpayOrderId },
+            data: { paymentStatus: 'failed', razorpayPaymentId },
           })
           .catch(() => {
             console.warn('[razorpay/webhook] No order matched', razorpayOrderId);
