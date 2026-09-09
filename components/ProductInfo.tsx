@@ -70,9 +70,9 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
 
-  const handleAddToCart = () => {
+  /** Puts the item in the cart, or nudges the size selector. Returns whether it went in. */
+  const putInCart = (): boolean => {
     if (!selectedSize) {
-      // Scroll to size selector
       const sizeSelector = document.querySelector('[data-size-selector]');
       if (sizeSelector) {
         sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -81,10 +81,9 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           sizeSelector.classList.remove('ring-2', 'ring-gray-900', 'ring-offset-2');
         }, 2000);
       }
-      return;
+      return false;
     }
-    
-    // Add to cart
+
     addItem({
       productId: product.id,
       name: product.name,
@@ -93,9 +92,18 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       size: selectedSize,
       image: product.images?.[0] || '/placeholder-product.jpg',
     });
-    
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (!putInCart()) return;
     setShowAddedToCart(true);
     setTimeout(() => setShowAddedToCart(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    if (!putInCart()) return;
+    router.push('/checkout');
   };
 
   const lowStockSizes = product.sizes.filter((size) => size.available && size.stock <= 3 && size.stock > 0);
@@ -204,6 +212,18 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             : showAddedToCart
             ? '✓ Added to Cart!'
             : 'Add to Cart'}
+        </button>
+
+        <button
+          onClick={handleBuyNow}
+          disabled={!selectedSize || !product.inStock}
+          className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all border-2 ${
+            !selectedSize || !product.inStock
+              ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+              : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white active:scale-95'
+          }`}
+        >
+          Buy Now
         </button>
 
         {/* Risk Reversal */}
