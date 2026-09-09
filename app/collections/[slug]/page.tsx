@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getProductsByCollectionFromDB } from '@/lib/products-db';
+import { getAllProductsFromDB, getProductsByCollectionFromDB } from '@/lib/products-db';
 import ProductReviewStars from '@/components/ProductReviewStars';
 import { shopCategories } from '@/lib/categories';
 
@@ -57,7 +57,12 @@ export default async function CollectionPage({
   }
 
   // Phase 4: Get products from database by collection
-  const products = await getProductsByCollectionFromDB(collectionData.name);
+  // No product carries the literal collection "New Arrivals"; it is simply the
+  // newest of everything, which is how the homepage rail treats it too.
+  const products =
+    params.slug === 'new-arrivals'
+      ? (await getAllProductsFromDB()).slice(0, 24)
+      : await getProductsByCollectionFromDB(collectionData.name);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -100,7 +105,7 @@ export default async function CollectionPage({
                       <img
                         src={productImage}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : productImage.startsWith('http') ? (
                       // HTTP/HTTPS URL - use Next.js Image
@@ -108,7 +113,7 @@ export default async function CollectionPage({
                         src={productImage}
                         alt={product.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         quality={80}
                       />

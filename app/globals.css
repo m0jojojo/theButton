@@ -2,16 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* The design is light only - components hardcode white surfaces and dark text -
+   so the body must not follow the operating system's dark preference. */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
 }
 
 body {

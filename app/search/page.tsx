@@ -237,7 +237,7 @@ function SearchResultsContent() {
                         <img
                           src={product.images[0]}
                           alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : product.images[0].startsWith('http') ? (
                         // HTTP/HTTPS URL - use Next.js Image
@@ -245,7 +245,7 @@ function SearchResultsContent() {
                           src={product.images[0]}
                           alt={product.name}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
                           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                           quality={80}
                         />

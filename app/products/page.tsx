@@ -60,7 +60,7 @@ export default async function AllProductsPage() {
                       <img
                         src={productImage}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
                       // HTTP/HTTPS URL - use Next.js Image
@@ -68,7 +68,7 @@ export default async function AllProductsPage() {
                         src={productImage}
                         alt={product.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         quality={80}
                       />

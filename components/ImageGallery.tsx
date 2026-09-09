@@ -44,7 +44,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
             <img
               src={validImages[selectedImage]}
               alt={`${productName} - Image ${selectedImage + 1}`}
-              className="w-full h-full object-cover cursor-pointer"
+              className="w-full h-full object-cover object-top cursor-pointer"
               onClick={handleImageClick}
             />
           ) : validImages[selectedImage].startsWith('http') ? (
@@ -53,7 +53,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               src={validImages[selectedImage]}
               alt={`${productName} - Image ${selectedImage + 1}`}
               fill
-              className="object-cover"
+              className="object-cover object-top"
               sizes="(max-width: 768px) 100vw, 50vw"
               priority={selectedImage === 0}
               onClick={handleImageClick}
@@ -104,7 +104,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                   <img
                     src={image}
                     alt={`${productName} thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
                 ) : image.startsWith('http') ? (
                   // HTTP/HTTPS URL - use Next.js Image
@@ -112,7 +112,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                     src={image}
                     alt={`${productName} thumbnail ${index + 1}`}
                     fill
-                    className="object-cover"
+                    className="object-cover object-top"
                     sizes="(max-width: 768px) 25vw, 20vw"
                     quality={75}
                   />

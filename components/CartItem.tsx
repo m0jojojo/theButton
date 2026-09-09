@@ -46,7 +46,7 @@ export default function CartItem({ item }: CartItemProps) {
               <img
                 src={item.image}
                 alt={item.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             ) : item.image.startsWith('http') ? (
               // HTTP/HTTPS URL - use Next.js Image
@@ -54,7 +54,7 @@ export default function CartItem({ item }: CartItemProps) {
                 src={item.image}
                 alt={item.name}
                 fill
-                className="object-cover"
+                className="object-cover object-top"
                 sizes="(max-width: 768px) 80px, 96px"
                 quality={75}
               />

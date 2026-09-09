@@ -224,7 +224,7 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
                           <img
                             src={validImage}
                             alt={product.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-top"
                             onError={(e) => {
                               console.error('[SearchBar] Image load error:', {
                                 productName: product.name,
@@ -246,7 +246,7 @@ export default function SearchBar({ onClose, mobile = false }: SearchBarProps) {
                             src={validImage}
                             alt={product.name}
                             fill
-                            className="object-cover"
+                            className="object-cover object-top"
                             sizes="48px"
                             quality={70}
                           />
