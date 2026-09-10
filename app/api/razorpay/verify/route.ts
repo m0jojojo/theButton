@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getRazorpay, isValidPaymentSignature } from '@/lib/razorpay-server';
+import { notifyOrderPlaced } from '@/lib/notifications';
 
 /**
  * Confirms a checkout callback and marks the order paid.
@@ -92,6 +93,8 @@ export async function POST(request: NextRequest) {
         razorpayPaymentId,
       },
     });
+
+    await notifyOrderPlaced(updated.id);
 
     return NextResponse.json({
       verified: true,

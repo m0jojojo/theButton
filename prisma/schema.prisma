@@ -113,6 +113,9 @@ model Order {
   paymentStatus  PaymentStatus @default(pending) @map("payment_status")
   razorpayOrderId   String?    @unique @map("razorpay_order_id")
   razorpayPaymentId String?    @map("razorpay_payment_id")
+  // Set once the confirmation emails go out, so the webhook and the verify
+  // route cannot both send for the same order.
+  notifiedAt        DateTime?  @map("notified_at")
   subtotal       Decimal       @db.Decimal(10, 2)
   shipping       Decimal       @db.Decimal(10, 2)
   total          Decimal       @db.Decimal(10, 2)

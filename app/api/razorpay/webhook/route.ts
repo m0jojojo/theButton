@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isValidWebhookSignature } from '@/lib/razorpay-server';
+import { notifyOrderPlaced } from '@/lib/notifications';
 
 /**
  * Razorpay webhook.
@@ -28,14 +29,17 @@ export async function POST(request: NextRequest) {
 
     if (razorpayOrderId && razorpayPaymentId) {
       if (event.event === 'payment.captured') {
-        await prisma.order
+        const paid = await prisma.order
           .update({
             where: { razorpayOrderId },
             data: { paymentStatus: 'paid', status: 'confirmed', razorpayPaymentId },
           })
           .catch(() => {
             console.warn('[razorpay/webhook] No order matched', razorpayOrderId);
+            return null;
           });
+
+        if (paid) await notifyOrderPlaced(paid.id);
       } else if (event.event === 'payment.failed') {
         // Record the failure so the order is not left pending forever.
         await prisma.order
