@@ -8,9 +8,9 @@
 export const contact = {
   email: 'poonam@rangrez.club',
   /** Display form, used in text. */
-  phone: '+91-7027479920',
+  phone: '+91-9466371290',
   /** Digits only with country code, the format wa.me and tel: expect. */
-  phoneDigits: '917027479920',
+  phoneDigits: '919466371290',
   address: {
     line1: 'H.No-496, Sector 4',
     line2: 'Rewari, Haryana, 123401',
