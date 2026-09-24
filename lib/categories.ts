@@ -69,6 +69,11 @@ export const shopCategories: ShopCategory[] = [
     name: 'Linen Dupatta Cotton Suits',
     description: 'Cotton suits finished with a textured linen dupatta',
   },
+  {
+    slug: 'maheshwari-silk-suits',
+    name: 'Maheshwari Silk Suits',
+    description: 'Maheshwari silk suit sets with classic reversible borders',
+  },
 ];
 
 export const categoryBySlug = new Map(
