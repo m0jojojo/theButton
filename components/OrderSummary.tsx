@@ -37,7 +37,7 @@ export default function OrderSummary({ items, subtotal, shipping, total }: Order
             <div className="flex-1 min-w-0">
               <p className="font-medium text-gray-900 truncate">{item.name}</p>
               <p className="text-gray-600 text-xs">
-                Size: {item.size} × {item.quantity}
+                Color: {item.size} × {item.quantity}
               </p>
             </div>
             <p className="font-semibold text-gray-900">{formatPrice(item.price * item.quantity)}</p>

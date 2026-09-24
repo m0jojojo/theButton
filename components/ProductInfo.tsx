@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import SizeSelector from './SizeSelector';
+import ColorSelector from './ColorSelector';
 import { motion } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
 import StarRating from './StarRating';
@@ -23,7 +23,7 @@ interface ProductInfoProps {
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
   const [reviewStats, setReviewStats] = useState<{ averageRating: number; totalReviews: number } | null>(null);
   const { addItem } = useCart();
@@ -70,15 +70,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
 
-  /** Puts the item in the cart, or nudges the size selector. Returns whether it went in. */
+  /** Puts the item in the cart, or nudges the color selector. Returns whether it went in. */
   const putInCart = (): boolean => {
-    if (!selectedSize) {
-      const sizeSelector = document.querySelector('[data-size-selector]');
-      if (sizeSelector) {
-        sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        sizeSelector.classList.add('ring-2', 'ring-gray-900', 'ring-offset-2');
+    if (!selectedColor) {
+      const colorSelector = document.querySelector('[data-color-selector]');
+      if (colorSelector) {
+        colorSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        colorSelector.classList.add('ring-2', 'ring-gray-900', 'ring-offset-2');
         setTimeout(() => {
-          sizeSelector.classList.remove('ring-2', 'ring-gray-900', 'ring-offset-2');
+          colorSelector.classList.remove('ring-2', 'ring-gray-900', 'ring-offset-2');
         }, 2000);
       }
       return false;
@@ -89,7 +89,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       name: product.name,
       price: product.price,
       compareAtPrice: product.compareAtPrice,
-      size: selectedSize,
+      size: selectedColor,
       image: product.images?.[0] || '/placeholder-product.jpg',
     });
     return true;
@@ -106,8 +106,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     router.push('/checkout');
   };
 
-  const lowStockSizes = product.sizes.filter((size) => size.available && size.stock <= 3 && size.stock > 0);
-  const hasLowStock = lowStockSizes.length > 0;
+  const lowStockColors = product.sizes.filter((color) => color.available && color.stock <= 3 && color.stock > 0);
+  const hasLowStock = lowStockColors.length > 0;
 
   return (
     <div className="space-y-6">
@@ -170,7 +170,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
-          <span>Only {lowStockSizes.map(s => `${s.stock} left in ${s.value}`).join(', ')}</span>
+          <span>Only {lowStockColors.map(c => `${c.stock} left in ${c.value}`).join(', ')}</span>
         </motion.div>
       )}
 
@@ -179,18 +179,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         <p className="text-gray-700 leading-relaxed">{product.description}</p>
       </div>
 
-      {/* Size Selector */}
-      <div data-size-selector>
+      {/* Color Selector */}
+      <div data-color-selector>
         <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-semibold">Size</label>
-          <a href="#size-guide" className="text-sm text-gray-600 hover:text-gray-900 underline">
-            Size Guide
-          </a>
+          <label className="text-sm font-semibold">Color</label>
         </div>
-        <SizeSelector
-          sizes={product.sizes}
-          selectedSize={selectedSize}
-          onSizeSelect={setSelectedSize}
+        <ColorSelector
+          colors={product.sizes}
+          selectedColor={selectedColor}
+          onColorSelect={setSelectedColor}
         />
       </div>
 
@@ -198,15 +195,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div className="space-y-3">
         <button
           onClick={handleAddToCart}
-          disabled={!selectedSize || !product.inStock}
+          disabled={!selectedColor || !product.inStock}
           className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
-            !selectedSize || !product.inStock
+            !selectedColor || !product.inStock
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-gray-900 text-white hover:bg-gray-800 active:scale-95'
           }`}
         >
-          {!selectedSize
-            ? 'Select a Size'
+          {!selectedColor
+            ? 'Select a Color'
             : !product.inStock
             ? 'Out of Stock'
             : showAddedToCart
@@ -216,9 +213,9 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
         <button
           onClick={handleBuyNow}
-          disabled={!selectedSize || !product.inStock}
+          disabled={!selectedColor || !product.inStock}
           className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all border-2 ${
-            !selectedSize || !product.inStock
+            !selectedColor || !product.inStock
               ? 'border-gray-200 text-gray-400 cursor-not-allowed'
               : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white active:scale-95'
           }`}

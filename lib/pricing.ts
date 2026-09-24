@@ -71,7 +71,7 @@ export async function priceCart(lines: CartLine[]): Promise<PricedOrder> {
       name: product.name,
       price,
       compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
-      size: line.size || 'Free Size',
+      size: line.size || 'Default',
       quantity,
       image: images[0] ?? '',
     });

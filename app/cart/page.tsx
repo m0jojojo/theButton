@@ -146,7 +146,7 @@ export default function CartPage() {
               {/* WhatsApp Checkout Option */}
               <a
                 href={whatsappHref(
-                  `Hi! I'd like to place an order:\n\n${items.map(item => `${item.name} (Size: ${item.size}) x${item.quantity} - ${formatPrice(item.price * item.quantity)}`).join('\n')}\n\nTotal: ${formatPrice(total)}`
+                  `Hi! I'd like to place an order:\n\n${items.map(item => `${item.name} (Color: ${item.size}) x${item.quantity} - ${formatPrice(item.price * item.quantity)}`).join('\n')}\n\nTotal: ${formatPrice(total)}`
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

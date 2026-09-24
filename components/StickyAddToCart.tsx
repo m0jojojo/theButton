@@ -18,7 +18,7 @@ interface StickyAddToCartProps {
 }
 
 export default function StickyAddToCart({ product }: StickyAddToCartProps) {
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [showAdded, setShowAdded] = useState(false);
   const pathname = usePathname();
@@ -45,15 +45,15 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
   };
 
   const handleAddToCart = () => {
-    if (!selectedSize) {
-      // Scroll to size selector in main product info
-      const sizeSelector = document.querySelector('[data-size-selector]');
-      if (sizeSelector) {
-        sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Highlight the size selector briefly
-        sizeSelector.classList.add('ring-2', 'ring-gray-900', 'ring-offset-2');
+    if (!selectedColor) {
+      // Scroll to color selector in main product info
+      const colorSelector = document.querySelector('[data-color-selector]');
+      if (colorSelector) {
+        colorSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight the color selector briefly
+        colorSelector.classList.add('ring-2', 'ring-gray-900', 'ring-offset-2');
         setTimeout(() => {
-          sizeSelector.classList.remove('ring-2', 'ring-gray-900', 'ring-offset-2');
+          colorSelector.classList.remove('ring-2', 'ring-gray-900', 'ring-offset-2');
         }, 2000);
       }
       return;
@@ -65,7 +65,7 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
       name: product.name,
       price: product.price,
       compareAtPrice: product.compareAtPrice,
-      size: selectedSize,
+      size: selectedColor,
       image: product.images?.[0] || '/placeholder-product.jpg',
     });
     
@@ -103,18 +103,18 @@ export default function StickyAddToCart({ product }: StickyAddToCartProps) {
                 <p className="text-xs text-gray-600 truncate">{product.name}</p>
               </div>
 
-              {/* Size Selector Dropdown */}
+              {/* Color Selector Dropdown */}
               <select
-                value={selectedSize || ''}
-                onChange={(e) => setSelectedSize(e.target.value || null)}
+                value={selectedColor || ''}
+                onChange={(e) => setSelectedColor(e.target.value || null)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white text-gray-900"
               >
-                <option value="">Size</option>
+                <option value="">Color</option>
                 {product.sizes
-                  .filter((size) => size.available)
-                  .map((size) => (
-                    <option key={size.value} value={size.value}>
-                      {size.value}
+                  .filter((color) => color.available)
+                  .map((color) => (
+                    <option key={color.value} value={color.value}>
+                      {color.value}
                     </option>
                   ))}
               </select>

@@ -280,7 +280,7 @@ export default function AdminOrderDetailPage() {
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="text-sm text-gray-500">Size: {item.size} | Qty: {item.quantity}</p>
+                        <p className="text-sm text-gray-500">Color: {item.size} | Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-gray-900">₹{item.price.toLocaleString()}</p>

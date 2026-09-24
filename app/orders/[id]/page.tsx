@@ -216,7 +216,7 @@ function OrderDetailsContent({ orderId }: { orderId: string }) {
                         {item.name}
                       </Link>
                       <p className="text-sm text-gray-600 mb-2">
-                        Size: <span className="font-medium text-gray-900">{item.size}</span>
+                        Color: <span className="font-medium text-gray-900">{item.size}</span>
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">

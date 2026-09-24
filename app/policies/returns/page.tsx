@@ -41,7 +41,7 @@ export default function ReturnPolicyPage() {
         <section>
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Exchanges</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            We currently offer exchanges for different sizes. Contact us on WhatsApp to arrange 
+            We currently offer exchanges for different colors. Contact us on WhatsApp to arrange
             an exchange.
           </p>
         </section>

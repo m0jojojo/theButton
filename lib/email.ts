@@ -61,7 +61,7 @@ function itemRows(items: OrderEmailItem[]): string {
         <tr>
           <td style="padding:10px 0;border-bottom:1px solid #eee;">
             ${escape(item.name)}<br>
-            <span style="color:#666;font-size:13px;">Size ${escape(item.size)} &middot; Qty ${item.quantity}</span>
+            <span style="color:#666;font-size:13px;">Color ${escape(item.size)} &middot; Qty ${item.quantity}</span>
           </td>
           <td style="padding:10px 0;border-bottom:1px solid #eee;text-align:right;white-space:nowrap;">
             ${rupees(item.price * item.quantity)}

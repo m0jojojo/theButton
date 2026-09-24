@@ -21,7 +21,7 @@ export default function NewProductPage() {
     collection: '',
     images: '',
   });
-  const [sizes, setSizes] = useState<Array<{ value: string; available: boolean; stock: number }>>([
+  const [colors, setColors] = useState<Array<{ value: string; available: boolean; stock: number }>>([
     { value: '', available: true, stock: 0 },
   ]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -233,23 +233,23 @@ export default function NewProductPage() {
     }
   };
 
-  const handleAddSize = () => {
-    setSizes([...sizes, { value: '', available: true, stock: 0 }]);
+  const handleAddColor = () => {
+    setColors([...colors, { value: '', available: true, stock: 0 }]);
   };
 
-  const handleRemoveSize = (index: number) => {
-    if (sizes.length > 1) {
-      setSizes(sizes.filter((_, i) => i !== index));
+  const handleRemoveColor = (index: number) => {
+    if (colors.length > 1) {
+      setColors(colors.filter((_, i) => i !== index));
     }
   };
 
-  const handleSizeChange = (index: number, field: 'value' | 'available' | 'stock', value: string | boolean | number) => {
-    const updatedSizes = [...sizes];
-    updatedSizes[index] = {
-      ...updatedSizes[index],
+  const handleColorChange = (index: number, field: 'value' | 'available' | 'stock', value: string | boolean | number) => {
+    const updatedColors = [...colors];
+    updatedColors[index] = {
+      ...updatedColors[index],
       [field]: value,
     };
-    setSizes(updatedSizes);
+    setColors(updatedColors);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -258,16 +258,16 @@ export default function NewProductPage() {
     setError('');
 
     try {
-      // Validate sizes
-      const validSizes = sizes.filter((size) => size.value.trim() !== '');
-      if (validSizes.length === 0) {
-        throw new Error('At least one size is required');
+      // Validate colors
+      const validColors = colors.filter((color) => color.value.trim() !== '');
+      if (validColors.length === 0) {
+        throw new Error('At least one color is required');
       }
 
-      // Validate that all sizes have valid stock
-      for (const size of validSizes) {
-        if (size.stock < 0) {
-          throw new Error(`Stock cannot be negative for size ${size.value}`);
+      // Validate that all colors have valid stock
+      for (const color of validColors) {
+        if (color.stock < 0) {
+          throw new Error(`Stock cannot be negative for color ${color.value}`);
         }
       }
 
@@ -293,7 +293,7 @@ export default function NewProductPage() {
           sku: formData.sku,
           collection: formData.collection,
           images: allImages,
-          sizes: validSizes,
+          sizes: validColors,
         }),
       });
 
@@ -383,7 +383,18 @@ export default function NewProductPage() {
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-8 space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(event) => {
+                // A barcode scanner types the code and then sends Enter, which
+                // would otherwise submit this form half-filled. Textareas and
+                // the submit button keep their normal behaviour.
+                if (event.key === 'Enter' && (event.target as HTMLElement).tagName === 'INPUT') {
+                  event.preventDefault();
+                }
+              }}
+              className="bg-white rounded-lg shadow p-8 space-y-6"
+            >
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                   {error}
@@ -628,56 +639,42 @@ export default function NewProductPage() {
                 <div className="md:col-span-2">
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      Product Sizes *
+                      Product Colors *
                     </label>
                     <button
                       type="button"
-                      onClick={handleAddSize}
+                      onClick={handleAddColor}
                       className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      Add Size
+                      Add Color
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {sizes.map((size, index) => (
+                    {colors.map((color, index) => (
                       <div key={index} className="flex gap-3 items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
                         <div className="flex-1">
                           <label className="block text-xs font-medium text-gray-600 mb-1">
-                            Size Value
+                            Color Name
                           </label>
-                          <select
-                            value={size.value}
-                            onChange={(e) => handleSizeChange(index, 'value', e.target.value)}
+                          <input
+                            type="text"
+                            value={color.value}
+                            onChange={(e) => handleColorChange(index, 'value', e.target.value)}
+                            placeholder="e.g. Maroon"
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-sm"
-                          >
-                            <option value="">Select Size</option>
-                            <option value="XS">XS</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
-                            <option value="28">28</option>
-                            <option value="30">30</option>
-                            <option value="32">32</option>
-                            <option value="34">34</option>
-                            <option value="36">36</option>
-                            <option value="38">38</option>
-                            <option value="40">40</option>
-                            <option value="One Size">One Size</option>
-                          </select>
+                          />
                         </div>
                         <div className="flex-1">
                           <label className="block text-xs font-medium text-gray-600 mb-1">
                             Available
                           </label>
                           <select
-                            value={size.available ? 'true' : 'false'}
-                            onChange={(e) => handleSizeChange(index, 'available', e.target.value === 'true')}
+                            value={color.available ? 'true' : 'false'}
+                            onChange={(e) => handleColorChange(index, 'available', e.target.value === 'true')}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-sm"
                           >
                             <option value="true">Available</option>
@@ -690,8 +687,8 @@ export default function NewProductPage() {
                           </label>
                           <input
                             type="number"
-                            value={size.stock}
-                            onChange={(e) => handleSizeChange(index, 'stock', parseInt(e.target.value) || 0)}
+                            value={color.stock}
+                            onChange={(e) => handleColorChange(index, 'stock', parseInt(e.target.value) || 0)}
                             min="0"
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-sm"
@@ -699,12 +696,12 @@ export default function NewProductPage() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleRemoveSize(index)}
-                          disabled={sizes.length === 1}
+                          onClick={() => handleRemoveColor(index)}
+                          disabled={colors.length === 1}
                           className={`mt-6 p-2 text-red-600 hover:text-red-800 transition-colors ${
-                            sizes.length === 1 ? 'opacity-50 cursor-not-allowed' : ''
+                            colors.length === 1 ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
-                          title="Remove size"
+                          title="Remove color"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -714,7 +711,7 @@ export default function NewProductPage() {
                     ))}
                   </div>
                   <p className="mt-2 text-sm text-gray-500">
-                    Add at least one size with value, availability, and stock quantity
+                    Add at least one color with name, availability, and stock quantity
                   </p>
                 </div>
               </div>
